@@ -31,6 +31,10 @@ var tutorialButtonS = new Image()
 tutorialButtonS.src = 'tutorialSelected.png'
 var tutorialButtonU = new Image()
 tutorialButtonU.src = 'tutorialUnselected.png'
+var creditsButtonS = new Image()
+creditsButtonS.src = 'creditsSelected.png'
+var creditsButtonU = new Image()
+creditsButtonU.src = 'creditsUnselected.png'
 
 
 var stageOneBG = new Image()
@@ -50,16 +54,22 @@ function updateCanvas(){
 	ctx.fillRect(0,0,WIDTH, HEIGHT)
 	
 	checkStage()
-	mainMenu()
+	mainMenuText()
 }
 
-function mainMenu(){
+function mainMenuText(){ // depending on what the player cursor is hovering it will change the images to display the change
 	if (playerSelection == 0){
 		ctx.drawImage(playButtonS, 25,100)
 		ctx.drawImage(tutorialButtonU, 55,150)
+		ctx.drawImage(creditsButtonU, 55, 200)
 	} else if (playerSelection == 1){
 		ctx.drawImage(playButtonU, 55, 100)
 		ctx.drawImage(tutorialButtonS, 25, 150)
+		ctx.drawImage(creditsButtonU,55, 200)
+	} else if (playerSelection == 2){
+		ctx.drawImage(playButtonU,55, 100)
+		ctx.drawImage(tutorialButtonU,55, 150)
+		ctx.drawImage(creditsButtonS,25, 200)
 	}
 }
 
@@ -72,37 +82,49 @@ function checkStage(){
 
 }
 
+function stageTransition2(){
+	stage = 2
+}
+
+// LISTENERS
+
 window.addEventListener('keydown', keyDownFunction)
 
 function keyDownFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
-	console.log("You just pressed", keyDown)
-	console.log(stage)
-	if (stage == 0){
-		if (keyDown == 'ArrowUp'){
-			if(playerSelection == 0){
-				playerSelection = 1
-				console.log(playerSelection)
-			}else if (playerSelection == 1){
+	if (stage == 0){ // only if we are on the main menu do these commands do these thnigs
+		if (keyDown == 'ArrowUp'){ // if youve reached the lowest you can go, dont go lower, if no go one lower.
+			if (playerSelection <= 0)
+			{
 				playerSelection = 0
-				console.log(playerSelection)
+			} else {
+				playerSelection--
 			}
 		}
 		
-		if (keyDown == 'ArrowDown'){
-			if(playerSelection == 0){
-				playerSelection = 1
-			} else if (playerSelection == 1){
-				playerSelection = 0
+		if (keyDown == 'ArrowDown'){ // if youve reached the highest you can go, dont go higher, if not go one higher
+			if (playerSelection >= 2)
+			{
+				playerSelection = 2
+			} else {
+				playerSelection++
 			}
 		}
 		
-		if (keyDown == 'z'){
+		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
-				//go to the level selection or something
+				//go to the level selection or something stage = 1
+				console.log("go to level selection")
 			} else if (playerSelection == 1){
-				// go to tutorial
+				stageTransition2()
+			} else if (playerSelection == 2){
+				// go to credits
+				console.log("go to credits")
 			}
+		}
+	} else if (stage == 2) { // only works in tutorial
+		if (keyDown == 'z' || keyDown == "Z"){
+			stage = 0
 		}
 	}
 }
