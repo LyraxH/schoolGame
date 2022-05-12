@@ -15,6 +15,7 @@ var stage = 0 //main menu, in game or where you are
 
 // Main Menu Variables
 var playerSelection = 0 // what the play wants to do
+var codeSelection = 0
 
 //tutorial variables
 var tutorialScreen = 0
@@ -22,6 +23,10 @@ var tutorialScreen = 0
 // below is the image variables
 var backgroundMenu = new Image() // background for the main menu
 backgroundMenu.src = 'backgrounds/earth.png'
+var backgroundCode = new Image() // background for Enter Code
+backgroundCode.src = 'backgrounds/moon.png'
+var credits = new Image() // credits page
+credits.src = 'backgrounds/credits.png'
 
 // images and sources for each button   (s = selected, u = unselected)
 var playButtonS = new Image()
@@ -36,6 +41,15 @@ var creditsButtonS = new Image()
 creditsButtonS.src = 'mainMenuText/creditsSelected.png'
 var creditsButtonU = new Image()
 creditsButtonU.src = 'mainMenuText/creditsUnselected.png'
+var enterCodeS = new Image()
+enterCodeS.src = 'mainMenuText/enterCodeSelected.png'
+var enterCodeU = new Image()
+enterCodeU.src = 'mainMenuText/enterCodeUnselected.png'
+
+var backS = new Image()
+backS.src = 'mainMenuText/backSelected.png'
+var backU = new Image()
+backU.src = 'mainMenuText/backUnselected.png'
 
 //images for the tutorial text  P = part L = line (e.g: P1L1 = Part 1 Line 1)
 var P1L1 = new Image()
@@ -108,10 +122,12 @@ function manageTutorial(){
 		if (tutorialScreen == 0){ //part one line one
 			ctx.drawImage(P1,0,0, 640, 480)
 			ctx.drawImage(P1L1, 0, 50, 650, 26)
+			ctx.drawImage(zContune, 150, 350, 325, 13)
 		} else if (tutorialScreen == 1){ // part one line two
 			ctx.drawImage(P1,0,0, 640, 480)
 			ctx.drawImage(P1L1, 0, 50, 650, 26)
 			ctx.drawImage(P1L2, 0, 90, 650, 52)
+			ctx.drawImage(zContune, 150, 350, 325, 13)
 		} else if (tutorialScreen == 2){ //part two line one
 			ctx.drawImage(P2,0,0, 640, 480)
 			ctx.drawImage(P2L1,0,50, 650, 26)
@@ -136,24 +152,69 @@ function manageTutorial(){
 			ctx.drawImage(P5,0,0)
 			ctx.drawImage(P4L2,0,50,650,52)
 			ctx.drawImage(P4L3,0,120,650,26)
+		} else if (tutorialScreen == 9){ // part five line one
+			ctx.drawImage(P6,0,0)
+			ctx.drawImage(P5L1,0,50,650,52)
+		} else if (tutorialScreen == 10){ // part five line two
+			ctx.fillStyle = 'black'
+			ctx.fillRect(0,0,WIDTH,HEIGHT)
+			ctx.fillStyle = 'white'
+			ctx.drawImage(P5L1,0,50,650,52)
+			ctx.drawImage(P5L2,0,120,650,26)
+		} else if (tutorialScreen == 11){ // part six Line one
+			ctx.fillStyle = 'black'
+			ctx.fillRect(0,0,WIDTH,HEIGHT)
+			ctx.fillStyle = 'white'
+			ctx.drawImage(P6L1, 0,50,650,26)
+		} else if (tutorialScreen == 12){ // part six line two
+			ctx.fillStyle = 'black'
+			ctx.fillRect(0,0,WIDTH,HEIGHT)
+			ctx.fillStyle = 'white'
+			ctx.drawImage(P6L2,0,200,650,26)
+		} else if (tutorialScreen == 13){
+			stage = 0
+			//this is the part where the tutorial actually happens but i need screenshots from game to do that
 		}
 	}
-
 }
 
 function mainMenuText(){ // depending on what the player cursor is hovering it will change the images to display the change
-	if (playerSelection == 0){
-		ctx.drawImage(playButtonS, 25,100)
-		ctx.drawImage(tutorialButtonU, 55,150)
-		ctx.drawImage(creditsButtonU, 55, 200)
-	} else if (playerSelection == 1){
-		ctx.drawImage(playButtonU, 55, 100)
-		ctx.drawImage(tutorialButtonS, 25, 150)
-		ctx.drawImage(creditsButtonU,55, 200)
-	} else if (playerSelection == 2){
-		ctx.drawImage(playButtonU,55, 100)
-		ctx.drawImage(tutorialButtonU,55, 150)
-		ctx.drawImage(creditsButtonS,25, 200)
+	if (stage == 0){
+		if (playerSelection == 0){ // play is selected
+			ctx.drawImage(playButtonS, 25,100)
+			ctx.drawImage(tutorialButtonU, 55,150)
+			ctx.drawImage(creditsButtonU, 55, 200)
+			ctx.drawImage(enterCodeU,55, 250)
+		} else if (playerSelection == 1){ // tutorial is selected
+			ctx.drawImage(playButtonU, 55, 100)
+			ctx.drawImage(tutorialButtonS, 25, 150)
+			ctx.drawImage(creditsButtonU,55, 200)
+			ctx.drawImage(enterCodeU,55, 250)
+		} else if (playerSelection == 2){ // credits are selected
+			ctx.drawImage(playButtonU,55, 100)
+			ctx.drawImage(tutorialButtonU,55, 150)
+			ctx.drawImage(creditsButtonS,25, 200)
+			ctx.drawImage(enterCodeU,55, 250)
+		} else if (playerSelection == 3){ // enter code is selected
+			ctx.drawImage(playButtonU,55, 100)
+			ctx.drawImage(tutorialButtonU,55, 150)
+			ctx.drawImage(creditsButtonU,55, 200)
+			ctx.drawImage(enterCodeS,25, 250)
+		}
+	} else if (stage == 1){
+
+	} else if (stage == 2){
+		if (codeSelection == 0){ // back button is selected
+			ctx.drawImage(backS,0,0)
+		} else if (codeSelection == 1){
+			ctx.drawImage(backU,30,0)
+		}
+	} else if (stage == 3){
+		if (codeSelection == 0){ // back button is selected
+			ctx.drawImage(backS,0,0)
+		} else if (codeSelection == 1){
+			ctx.drawImage(backU,30,0)
+		}
 	}
 }
 
@@ -162,6 +223,12 @@ function checkStage(){
 		ctx.drawImage(backgroundMenu,0,-150,WIDTH,HEIGHT)
 	} else if (stage == 1){ // tutorial backgrounds
 		ctx.drawImage(stageOneBG, 0, 0, WIDTH, HEIGHT)
+	} else if (stage == 2){ // creidts or something
+		ctx.fillStyle = 'black'
+		ctx.fillRect(0,0,WIDTH,HEIGHT)
+		ctx.drawImage(credits,0,50)
+	} else if (stage == 3){
+		ctx.drawImage(backgroundCode,0,0)
 	}
 
 }
@@ -181,16 +248,14 @@ function keyDownFunction(keyboardEvent){
 				playerSelection--
 			}
 		}
-		
 		if (keyDown == 'ArrowDown'){ // if youve reached the highest you can go, dont go higher, if not go one higher
-			if (playerSelection >= 2)
+			if (playerSelection >= 3)
 			{
-				playerSelection = 2
+				playerSelection = 3
 			} else {
 				playerSelection++
 			}
-		}
-		
+		}	
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
 				//go to the level selection or something stage = 1
@@ -198,8 +263,11 @@ function keyDownFunction(keyboardEvent){
 			} else if (playerSelection == 1){
 				stage = 1
 			} else if (playerSelection == 2){
-				// go to credits
+				stage = 2
 				console.log("go to credits")
+			} else if (playerSelection == 3){
+				stage = 3
+				console.log("go to enter Code")
 			}
 		}
 	} else if (stage == 1){ // only works in tutorial
@@ -207,8 +275,26 @@ function keyDownFunction(keyboardEvent){
 			tutorialScreen++
 			console.log(tutorialScreen)
 		}
-	} else if (stage == 2) { // only works in credits
-		if (keyDown == 'z' || keyDown == "Z"){
+	} else if (stage == 3 || stage == 2){ // only works in enter code
+	if (keyDown == 'ArrowUp'){
+		if (codeSelection <= 0)
+		{
+			codeSelection = 0
+		} else {
+			codeSelection--
+		}
+	}
+	if (keyDown == 'ArrowDown'){ // if youve reached the highest you can go, dont go higher, if not go one higher
+		if (codeSelection >= 1){
+			codeSelection = 1
+		} else {
+			codeSelection++
+		}
+	}
+		if (keyDown == 'z' || keyDown == 'Z'){
+			if (codeSelection == 0){
+				stage = 0
+			}
 		}
 	}
 }
