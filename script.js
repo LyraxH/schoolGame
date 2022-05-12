@@ -28,6 +28,7 @@ backgroundCode.src = 'backgrounds/moon.png'
 var credits = new Image() // credits page
 credits.src = 'backgrounds/credits.png'
 
+//#region main menu buttons + back
 // images and sources for each button   (s = selected, u = unselected)
 var playButtonS = new Image()
 playButtonS.src = 'mainMenuText/playSelected.png'
@@ -50,7 +51,9 @@ var backS = new Image()
 backS.src = 'mainMenuText/backSelected.png'
 var backU = new Image()
 backU.src = 'mainMenuText/backUnselected.png'
+//#endregion
 
+//#region tutorial text images
 //images for the tutorial text  P = part L = line (e.g: P1L1 = Part 1 Line 1)
 var P1L1 = new Image()
 P1L1.src = "tutorialText/P1L1.png"
@@ -80,7 +83,9 @@ var P6L2 = new Image()
 P6L2.src = 'tutorialText/P6L2.png'
 var zContune = new Image()
 zContune.src = 'tutorialText/ztocontinue.png'
+//#endregion
 
+//#region lore backgrounds
 var P1 = new Image()
 P1.src = 'backgrounds/P1.png' // lab
 var P2 = new Image()
@@ -93,13 +98,15 @@ var P5 = new Image()
 P5.src = 'backgrounds/P5.png' // mars
 var P6 = new Image()
 P6.src = 'backgrounds/P6.png' // earth jungle
+//#endregion
 
 
 
 var stageOneBG = new Image()
 
-
-//starts canvas upon loading the window
+var testBG1 = new Image()
+testBG1.src = 'backgrounds/marsTest.png'
+//starts the canvas when the window opens
 window.onload=startCanvas
 
 function startCanvas(){
@@ -117,6 +124,7 @@ function updateCanvas(){
 	manageTutorial()
 }
 
+//#region tutorialthings
 function manageTutorial(){
 	if (stage == 1){
 		if (tutorialScreen == 0){ //part one line one
@@ -173,11 +181,14 @@ function manageTutorial(){
 			ctx.drawImage(P6L2,0,200,650,26)
 		} else if (tutorialScreen == 13){
 			stage = 0
+			tutorialScreen = 0
 			//this is the part where the tutorial actually happens but i need screenshots from game to do that
 		}
 	}
 }
+//#endregion
 
+//#region mainMenuSelection
 function mainMenuText(){ // depending on what the player cursor is hovering it will change the images to display the change
 	if (stage == 0){
 		if (playerSelection == 0){ // play is selected
@@ -202,7 +213,6 @@ function mainMenuText(){ // depending on what the player cursor is hovering it w
 			ctx.drawImage(enterCodeS,25, 250)
 		}
 	} else if (stage == 1){
-
 	} else if (stage == 2){
 		if (codeSelection == 0){ // back button is selected
 			ctx.drawImage(backS,0,0)
@@ -217,6 +227,7 @@ function mainMenuText(){ // depending on what the player cursor is hovering it w
 		}
 	}
 }
+//#endregion
 
 function checkStage(){
 	if (stage == 0){ // main menu and main menu backgrounds
@@ -258,16 +269,20 @@ function keyDownFunction(keyboardEvent){
 		}	
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
-				//go to the level selection or something stage = 1
+				//go to the level selection or something stage = 4
 				console.log("go to level selection")
-			} else if (playerSelection == 1){
+			} else if (playerSelection == 1){ // go to tutorial
 				stage = 1
-			} else if (playerSelection == 2){
+				console.log("go to tutorial")
+				console.log(stage)
+			} else if (playerSelection == 2){ // go to credits
 				stage = 2
 				console.log("go to credits")
-			} else if (playerSelection == 3){
+				console.log(stage)
+			} else if (playerSelection == 3){ // go to enter code
 				stage = 3
 				console.log("go to enter Code")
+				console.log(stage)
 			}
 		}
 	} else if (stage == 1){ // only works in tutorial
@@ -296,5 +311,7 @@ function keyDownFunction(keyboardEvent){
 				stage = 0
 			}
 		}
+	} else if (stage == 4){ // acutal code that makes the acutal game work
+		
 	}
 }
