@@ -16,25 +16,70 @@ var stage = 0 //main menu, in game or where you are
 // Main Menu Variables
 var playerSelection = 0 // what the play wants to do
 
-//background Variables
-var scrollSpeed = 5 // how fast background moves
+//tutorial variables
+var tutorialScreen = 0
 
 // below is the image variables
 var backgroundMenu = new Image() // background for the main menu
-backgroundMenu.src = 'earth.png'
+backgroundMenu.src = 'backgrounds/earth.png'
 
+// images and sources for each button   (s = selected, u = unselected)
 var playButtonS = new Image()
-playButtonS.src = 'playSelected.png'
+playButtonS.src = 'mainMenuText/playSelected.png'
 var playButtonU = new Image()
-playButtonU.src = 'playUnselected.png'
+playButtonU.src = 'mainMenuText/playUnselected.png'
 var tutorialButtonS = new Image()
-tutorialButtonS.src = 'tutorialSelected.png'
+tutorialButtonS.src = 'mainMenuText/tutorialSelected.png'
 var tutorialButtonU = new Image()
-tutorialButtonU.src = 'tutorialUnselected.png'
+tutorialButtonU.src = 'mainMenuText/tutorialUnselected.png'
 var creditsButtonS = new Image()
-creditsButtonS.src = 'creditsSelected.png'
+creditsButtonS.src = 'mainMenuText/creditsSelected.png'
 var creditsButtonU = new Image()
-creditsButtonU.src = 'creditsUnselected.png'
+creditsButtonU.src = 'mainMenuText/creditsUnselected.png'
+
+//images for the tutorial text  P = part L = line (e.g: P1L1 = Part 1 Line 1)
+var P1L1 = new Image()
+P1L1.src = "tutorialText/P1L1.png"
+var P1L2 = new Image()
+P1L2.src = 'tutorialText/P1L2.png'
+var P2L1 = new Image()
+P2L1.src = 'tutorialText/P2L1.png'
+var P2L2 = new Image()
+P2L2.src = 'tutorialText/P2L2.png'
+var P3L1 = new Image()
+P3L1.src = 'tutorialText/P3L1.png'
+var P3L2 = new Image()
+P3L2.src = 'tutorialText/P3L2.png'
+var P4L1 = new Image()
+P4L1.src = 'tutorialText/P4L1.png'
+var P4L2 = new Image()
+P4L2.src = 'tutorialText/P4L2.png'
+var P4L3 = new Image()
+P4L3.src = 'tutorialText/P4L3.png'
+var P5L1 = new Image()
+P5L1.src = 'tutorialText/P5L1.png'
+var P5L2 = new Image()
+P5L2.src = 'tutorialText/P5L2.png'
+var P6L1 = new Image()
+P6L1.src = 'tutorialText/P6L1.png'
+var P6L2 = new Image()
+P6L2.src = 'tutorialText/P6L2.png'
+var zContune = new Image()
+zContune.src = 'tutorialText/ztocontinue.png'
+
+var P1 = new Image()
+P1.src = 'backgrounds/P1.png' // lab
+var P2 = new Image()
+P2.src = 'backgrounds/P2.png' // lab with errors
+var P3 = new Image()
+P3.src = 'backgrounds/P3.png' // broken town
+var P4 = new Image()
+P4.src = 'backgrounds/P4.png' // space shuttle
+var P5 = new Image()
+P5.src = 'backgrounds/P5.png' // mars
+var P6 = new Image()
+P6.src = 'backgrounds/P6.png' // earth jungle
+
 
 
 var stageOneBG = new Image()
@@ -55,6 +100,45 @@ function updateCanvas(){
 	
 	checkStage()
 	mainMenuText()
+	manageTutorial()
+}
+
+function manageTutorial(){
+	if (stage == 1){
+		if (tutorialScreen == 0){ //part one line one
+			ctx.drawImage(P1,0,0, 640, 480)
+			ctx.drawImage(P1L1, 0, 50, 650, 26)
+		} else if (tutorialScreen == 1){ // part one line two
+			ctx.drawImage(P1,0,0, 640, 480)
+			ctx.drawImage(P1L1, 0, 50, 650, 26)
+			ctx.drawImage(P1L2, 0, 90, 650, 52)
+		} else if (tutorialScreen == 2){ //part two line one
+			ctx.drawImage(P2,0,0, 640, 480)
+			ctx.drawImage(P2L1,0,50, 650, 26)
+		} else if (tutorialScreen == 3){ //part two line two
+			ctx.drawImage(P2,0,0,640,480)
+			ctx.drawImage(P2L1,0,50, 650, 26)
+			ctx.drawImage(P2L2,0,90, 650, 52)
+		} else if (tutorialScreen == 4){ // part three line one
+			ctx.drawImage(P3,0,0)
+			ctx.drawImage(P3L1,0,50, 650, 52)
+		} else if (tutorialScreen == 5){ //part three line two
+			ctx.drawImage(P3,0,0)
+			ctx.drawImage(P3L1,0,50, 650, 52)
+			ctx.drawImage(P3L2,0,130, 650, 26)
+		} else if (tutorialScreen == 6){ // part four line one
+			ctx.drawImage(P4,0,0)
+			ctx.drawImage(P4L1,0,50,650,52)
+		} else if (tutorialScreen == 7){ // part four line two
+			ctx.drawImage(P5,0,0)
+			ctx.drawImage(P4L2,0,50,650,52)
+		} else if (tutorialScreen == 8){ // part four line three
+			ctx.drawImage(P5,0,0)
+			ctx.drawImage(P4L2,0,50,650,52)
+			ctx.drawImage(P4L3,0,120,650,26)
+		}
+	}
+
 }
 
 function mainMenuText(){ // depending on what the player cursor is hovering it will change the images to display the change
@@ -74,16 +158,12 @@ function mainMenuText(){ // depending on what the player cursor is hovering it w
 }
 
 function checkStage(){
-	if (stage == 0){
+	if (stage == 0){ // main menu and main menu backgrounds
 		ctx.drawImage(backgroundMenu,0,-150,WIDTH,HEIGHT)
-	} else if (stage == 1){
+	} else if (stage == 1){ // tutorial backgrounds
 		ctx.drawImage(stageOneBG, 0, 0, WIDTH, HEIGHT)
 	}
 
-}
-
-function stageTransition2(){
-	stage = 2
 }
 
 // LISTENERS
@@ -116,15 +196,19 @@ function keyDownFunction(keyboardEvent){
 				//go to the level selection or something stage = 1
 				console.log("go to level selection")
 			} else if (playerSelection == 1){
-				stageTransition2()
+				stage = 1
 			} else if (playerSelection == 2){
 				// go to credits
 				console.log("go to credits")
 			}
 		}
-	} else if (stage == 2) { // only works in tutorial
+	} else if (stage == 1){ // only works in tutorial
+		if (keyDown == 'z' || keyDown == 'Z'){
+			tutorialScreen++
+			console.log(tutorialScreen)
+		}
+	} else if (stage == 2) { // only works in credits
 		if (keyDown == 'z' || keyDown == "Z"){
-			stage = 0
 		}
 	}
 }
