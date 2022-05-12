@@ -12,10 +12,18 @@ const HEIGHT = 640
 
 var ctx
 var stage = 0 //main menu, in game or where you are
+var enterCode = 0 // this is what tells the game what location to start in
 
 // Main Menu Variables
 var playerSelection = 0 // what the play wants to do
 var codeSelection = 0
+
+//movement variables
+var movingUp = false
+var moveingLeft = false
+var movingRight = false
+var movingDown = false
+var lastPressed = 0 // 0 = left 1 = right
 
 //tutorial variables
 var tutorialScreen = 0
@@ -85,6 +93,13 @@ var zContune = new Image()
 zContune.src = 'tutorialText/ztocontinue.png'
 //#endregion
 
+//#region chracters
+var astronautLeft = new Image()
+astronautLeft.src = 'characters/astronautLeft.png'
+var astronautRight = new Image()
+astronautRight.src = 'characters/astronautRight.png'
+//#endregion
+
 //#region lore backgrounds
 var P1 = new Image()
 P1.src = 'backgrounds/P1.png' // lab
@@ -106,7 +121,7 @@ var stageOneBG = new Image()
 
 var testBG1 = new Image()
 testBG1.src = 'backgrounds/marsTest.png'
-//starts the canvas when the window opens
+//starts the canvas when the window opensx
 window.onload=startCanvas
 
 function startCanvas(){
@@ -122,6 +137,8 @@ function updateCanvas(){
 	checkStage()
 	mainMenuText()
 	manageTutorial()
+	chracterFacing()
+	console.log(enterCode)
 }
 
 //#region tutorialthings
@@ -244,9 +261,82 @@ function checkStage(){
 
 }
 
-// LISTENERS
+function chracterFacing(){
+	if (stage == 4){
+		if (lastPressed == 1){
+			ctx.drawImage(astronautRight,280,180,61,84)
+		} else if (lastPressed == 0){
+			ctx.drawImage(astronautLeft,280,180,61,84)
+		}
+	}
+}
+
+function moveBackground(){
+	
+}
+
+//#region html buttons
+function submitCode(){
+	if (stage == 2) {
+		enterCode = document.getElementById('enterCode').getContext
+	} else if (!stage == 2){
+		
+	}
+	
+}
+//#endregion
+// LISTENERS + all keyboard interactions
 
 window.addEventListener('keydown', keyDownFunction)
+window.addEventListener('keydown', inGameFunction)
+window.addEventListener('keyup', keyUpFunction)
+
+function keyUpFunction(keyboardEvent){
+	var keyUp = keyboardEvent.key
+	if (stage == 4){
+		if (keyUp == "w" || keyUp == "W"){ // release up key
+			movingUp = false
+			//console.log("w released")
+		}
+		if (keyUp == "a" || keyUp == "A"){ // release left key
+			moveingLeft = false
+			//console.log("a released")
+		}
+		if (keyUp == "s" || keyUp == "S"){ // release down key
+			movingDown = false
+			//console.log("s released")
+		}
+		if (keyUp == "d" || keyUp == "D"){ // release right key
+			movingRight = false
+			//console.log("d released")
+		}
+	}
+}
+
+function inGameFunction(keyboardEvent){
+	var keyDown = keyboardEvent.key
+	if (stage == 4){ // this makes it only work in the game stage
+		if (keyDown == "w" || keyDown == "W"){ // press up key
+			movingUp = true
+			//console.log("w pressed")
+		}
+		if (keyDown == "a" || keyDown == "A"){ // press left key
+			movingLeft = true
+			lastPressed = 0
+			//console.log("a pressed")
+		}
+		if (keyDown == "s" || keyDown == "S"){ // press down key
+			movingDown = true
+			//console.log("s pressed")
+		}
+		if (keyDown == "d" || keyDown == "D"){ // press right key
+			movingRight = true
+			lastPressed = 1
+			//console.log("d pressed")
+		}
+	}
+}
+
 
 function keyDownFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
@@ -270,6 +360,7 @@ function keyDownFunction(keyboardEvent){
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
 				//go to the level selection or something stage = 4
+				stage = 4
 				console.log("go to level selection")
 			} else if (playerSelection == 1){ // go to tutorial
 				stage = 1
@@ -311,7 +402,5 @@ function keyDownFunction(keyboardEvent){
 				stage = 0
 			}
 		}
-	} else if (stage == 4){ // acutal code that makes the acutal game work
-		
 	}
 }
