@@ -3,17 +3,21 @@
 <head>
   <title>Last Chosen</title>
   <script src="script.js"></script>
+  <link rel="icon" href="lastchosenicon.png">
 </head>
   <body>
-
-  <canvas id="myCanvas" width="640" height="480" style="border:1px solid #000000;">
-  Your browser does not support the canvas element.
-  </canvas>
-    <h1> get me credits </h1>
-
-    <h2>Input Code</h2>
-    <input type = "text" id="enterCode"> <br>
-    <button onclick="submitCode();"><p style="color:mediumslateblue;">Submit!</p></button>
-    <p id="warningText"></p>
+    <center>
+      <canvas id="myCanvas" width="640" height="480" style="border:1px solid #000000;">
+        Your browser does not support the canvas element.
+      </canvas>
+      <h1> Last Chosen </h1>
+      <h4>Taison Shea</h4>
+      <h2>Input Code</h2>
+      <input type="text" id=enterCode> <br>
+      <button onclick="submitCode();"><p style="color:mediumslateblue;">Submit code!</p></button>
+      <p id="errorCode" style="color: red"></p>
+     <p id="warningText"style="color: red"></p>
+    </center>
+    <!--<button onclick="manageFullScreen();"><p style="color:mediumslateblue;">Fullscreen</p></button>-->
   </body>
 </html> 

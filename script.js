@@ -7,8 +7,9 @@
 
 **/
 
-const WIDTH = 640
-const HEIGHT = 640
+var WIDTH = 640
+var HEIGHT = 480
+var isFullScreen = false
 
 var ctx
 var stage = 0 //main menu, in game or where you are
@@ -17,6 +18,7 @@ var enterCode = 0 // this is what tells the game what location to start in
 // Main Menu Variables
 var playerSelection = 0 // what the play wants to do
 var codeSelection = 0
+var codeInput = null
 
 //movement variables
 var movingUp = false
@@ -24,6 +26,7 @@ var moveingLeft = false
 var movingRight = false
 var movingDown = false
 var lastPressed = 0 // 0 = left 1 = right
+var zPressed = false
 
 //tutorial variables
 var tutorialScreen = 0
@@ -115,16 +118,14 @@ var P6 = new Image()
 P6.src = 'backgrounds/P6.png' // earth jungle
 //#endregion
 
-
-
-var stageOneBG = new Image()
-
 var testBG1 = new Image()
 testBG1.src = 'backgrounds/marsTest.png'
+
 //starts the canvas when the window opensx
 window.onload=startCanvas
 
 function startCanvas(){
+	isFullScreen = false
 	ctx=document.getElementById("myCanvas").getContext("2d")
 	//sets the framerate
 	timer = setInterval(updateCanvas, 20) 
@@ -138,7 +139,7 @@ function updateCanvas(){
 	mainMenuText()
 	manageTutorial()
 	chracterFacing()
-	console.log(enterCode)
+	updateCode()
 }
 
 //#region tutorialthings
@@ -248,9 +249,11 @@ function mainMenuText(){ // depending on what the player cursor is hovering it w
 
 function checkStage(){
 	if (stage == 0){ // main menu and main menu backgrounds
-		ctx.drawImage(backgroundMenu,0,-150,WIDTH,HEIGHT)
+		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillRect(0,0,WIDTH,HEIGHT)
+		ctx.drawImage(backgroundMenu,150,-80,WIDTH,HEIGHT)
 	} else if (stage == 1){ // tutorial backgrounds
-		ctx.drawImage(stageOneBG, 0, 0, WIDTH, HEIGHT)
+		ctx.drawImage(P1, 0, 0, WIDTH, HEIGHT)
 	} else if (stage == 2){ // creidts or something
 		ctx.fillStyle = 'black'
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
@@ -275,17 +278,92 @@ function moveBackground(){
 	
 }
 
-//#region html buttons
+function updateCode(){
+	codeInput = document.getElementById("enterCode").value
+	console.log(codeInput)
+}
+
+//#region codes
 function submitCode(){
-	if (stage == 2) {
-		enterCode = document.getElementById('enterCode').getContext
-	} else if (!stage == 2){
-		
+	if (stage == 3){
+		if (codeInput == null || codeInput == ""){ // checks there is acutally a code written in and if there isnt it will give error
+			var warningText = document.getElementById("warningText")
+			var errorCode = document.getElementById("errorCode")
+			errorCode.innerHTML = "Error Code: 131202"
+			warningText.innerHTML = "Please enter a code <br> Press x to close this notice"
+		} else { // if there is a code it checks it with the following list
+			if(codeInput == "121231234"){ // with send you to the first stage on earth
+				codeSelection = 0
+				console.log("good code")
+				var warningText = document.getElementById("warningText")
+				var errorCode = document.getElementById("errorCode")
+				warningText.innerHTML = ""
+				errorCode.innerHTML = ""
+			} else if (codeInput == "othercode"){ // sends you to second stage on earth
+				codeSelection = 1
+				console.log("good code")
+				var warningText = document.getElementById("warningText")
+				var errorCode = document.getElementById("errorCode")
+				warningText.innerHTML = ""
+				errorCode.innerHTML = ""
+			} else if (codeInput == "asdasd"){ // sends you to right before final boss battle
+				codeSelection = 2
+				console.log("good code")
+				var warningText = document.getElementById("warningText")
+				var errorCode = document.getElementById("errorCode")
+				warningText.innerHTML = ""
+				errorCode.innerHTML = ""
+			} else if (codeInput == "entergodmodelmao"){ //gives you god mode
+				//give god mode
+				console.log("good code")
+				var warningText = document.getElementById("warningText")
+				var errorCode = document.getElementById("errorCode")
+				warningText.innerHTML = ""
+				errorCode.innerHTML = ""
+			} else { // if thez code they entered was wrong
+				var warningText = document.getElementById("warningText")
+				var errorCode = document.getElementById("errorCode")
+				errorCode.innerHTML = "Error Code: 188010"
+				warningText.innerHTML = "Please enter a correct code <br> Press x to close this notice"
+			}
+		}
+	} else if (stage == 1){
+		var warningText = document.getElementById("warningText")
+		var errorCode = document.getElementById("errorCode")
+		errorCode.innerHTML = "Error Code: 186010"
+		warningText.innerHTML = "Code cannot be entered in tutorial <br> Press x to close this notice"
+	} else if (stage == 2){ // if they are trying to access this button by using another tab ingame
+		var warningText = document.getElementById("warningText")
+		var errorCode = document.getElementById("errorCode")
+		errorCode.innerHTML = "Error Code: 164384"
+		warningText.innerHTML = "Code cannot be entered in credits <br> Press x to close this notice"
+	} else if (stage == 0){ // if they are trying to access this button by using another tab ingame
+		var warningText = document.getElementById("warningText")
+		var errorCode = document.getElementById("errorCode")
+		errorCode.innerHTML = "Error Code: 164384"
+		warningText.innerHTML = "Code cannot be entered in the Main Menu <br> Press x to close this notice"
 	}
-	
 }
 //#endregion
-// LISTENERS + all keyboard interactions
+
+function manageFullScreen(){
+	if (isFullScreen){
+		var canvas = document.getElementById('myCanvas')
+		HEIGHT = 480
+		WIDTH = 640
+		canvas.height = HEIGHT
+		canvas.width = WIDTH
+		isFullScreen = false
+	} else if(!isFullScreen){
+		var canvas = document.getElementById('myCanvas')
+		HEIGHT = 960
+		WIDTH = 1280
+		canvas.height = HEIGHT
+		canvas.width = WIDTH
+		isFullScreen = true
+	}
+}
+//#region LISTENERS + all keyboard interactions
 
 window.addEventListener('keydown', keyDownFunction)
 window.addEventListener('keydown', inGameFunction)
@@ -309,6 +387,10 @@ function keyUpFunction(keyboardEvent){
 		if (keyUp == "d" || keyUp == "D"){ // release right key
 			movingRight = false
 			//console.log("d released")
+		}
+		if (keyUp == 'z' || keyUp == 'Z'){
+			zPressed = false
+			//console.log("z released")
 		}
 	}
 }
@@ -334,12 +416,22 @@ function inGameFunction(keyboardEvent){
 			lastPressed = 1
 			//console.log("d pressed")
 		}
+		if (keyDown == 'z' || keyDown == 'Z'){
+			zPressed = true
+			//console.log("z pressed")
+		}
 	}
 }
 
 
 function keyDownFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
+	if (keyDown == 'x' || keyDown == 'X'){
+		var warningText = document.getElementById("warningText")
+		var errorCode = document.getElementById("errorCode")
+		warningText.innerHTML = ""
+		errorCode.innerHTML = ""
+	}
 	if (stage == 0){ // only if we are on the main menu do these commands do these thnigs
 		if (keyDown == 'ArrowUp'){ // if youve reached the lowest you can go, dont go lower, if no go one lower.
 			if (playerSelection <= 0)
@@ -359,9 +451,13 @@ function keyDownFunction(keyboardEvent){
 		}	
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
-				//go to the level selection or something stage = 4
-				stage = 4
-				console.log("go to level selection")
+				if (codeSelection == 0){ // start from the beginning
+
+				} else if (codeSelection == 1){ //start from stage one on earth
+
+				} else if (codeSelection == 2){ // start from stage two on earth
+
+				}
 			} else if (playerSelection == 1){ // go to tutorial
 				stage = 1
 				console.log("go to tutorial")
@@ -404,3 +500,4 @@ function keyDownFunction(keyboardEvent){
 		}
 	}
 }
+//#endregion
