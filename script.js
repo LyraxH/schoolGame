@@ -258,7 +258,7 @@ function checkStage(){
 		ctx.fillStyle = 'black'
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
 		ctx.drawImage(credits,0,50)
-	} else if (stage == 3){
+	} else if (stage == 3){ // enter codes
 		ctx.drawImage(backgroundCode,0,0)
 	}
 
