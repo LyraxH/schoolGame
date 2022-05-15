@@ -1,7 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Koulen&display=swap');
 
+head {
+    background-color: rgb(12, 12, 12);
+}
 body {
     font-family: 'Koulen', cursive;
+    background-color: rgb(12, 12, 12);
 }
 
 p {
