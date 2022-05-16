@@ -19,14 +19,19 @@ var enterCode = 0 // this is what tells the game what location to start in
 var playerSelection = 0 // what the play wants to do
 var codeSelection = 0
 var codeInput = null
+var goodCode = false
 
 //movement variables
 var movingUp = false
-var moveingLeft = false
+var movingLeft = false
 var movingRight = false
 var movingDown = false
 var lastPressed = 0 // 0 = left 1 = right
 var zPressed = false
+
+// game variables
+var moveSpeed = 5 // movement
+var inventoryOpen = false
 
 //tutorial variables
 var tutorialScreen = 0
@@ -38,7 +43,18 @@ var backgroundCode = new Image() // background for Enter Code
 backgroundCode.src = 'backgrounds/moon.png'
 var credits = new Image() // credits page
 credits.src = 'backgrounds/credits.png'
+var saveLoaded = new Image() // message that says youve loaded your progress
+saveLoaded.src = 'mainMenuText/1ProgressLoaded.png'
 
+// images for the inventory
+var inventoryClosed = new Image()
+inventoryClosed.src = 'inventory'
+var inventoryTeam = new Image()
+inventoryTeam.src =
+var inventoryItems = new Image()
+inventoryItems.src = 
+var inventorySave = new Image()
+inventorySave.src = 
 //#region main menu buttons + back
 // images and sources for each button   (s = selected, u = unselected)
 var playButtonS = new Image()
@@ -140,6 +156,7 @@ function updateCanvas(){
 	manageTutorial()
 	chracterFacing()
 	updateCode()
+	moveBackground()
 }
 
 //#region tutorialthings
@@ -260,6 +277,9 @@ function checkStage(){
 		ctx.drawImage(credits,0,50)
 	} else if (stage == 3){ // enter codes
 		ctx.drawImage(backgroundCode,0,0)
+		if (goodCode){
+			ctx.drawImage(saveLoaded,0,100,640,100)
+		}
 	}
 
 }
@@ -267,18 +287,35 @@ function checkStage(){
 function chracterFacing(){
 	if (stage == 4){
 		if (lastPressed == 1){
-			ctx.drawImage(astronautRight,280,180,61,84)
+			ctx.drawImage(astronautRight,280,180,51,74)
 		} else if (lastPressed == 0){
-			ctx.drawImage(astronautLeft,280,180,61,84)
+			ctx.drawImage(astronautLeft,280,180,51,74)
 		}
 	}
 }
 
 function moveBackground(){
-	
+	if (stage == 4){
+		var BGxPosition
+		var BGyPosition
+		ctx.drawImage(testBG1,BGxPosition,BGyPosition,3000,3000)
+		if (movingUp){
+			BGyPosition = BGyPosition - moveSpeed
+		}
+		if(movingLeft){
+			BGxPosition = BGxPosition - moveSpeed
+		}
+		if(movingDown){
+			BGyPosition = BGyPosition + moveSpeed
+		}
+		if(movingRight){
+			BGxPosition = BGxPosition + moveSpeed
+		}
+	}
+
 }
 
-function updateCode(){
+function updateCode(){ // this just takes the input field in the html and puts it into a variable
 	codeInput = document.getElementById("enterCode").value
 	console.log(codeInput)
 }
@@ -292,9 +329,10 @@ function submitCode(){
 			errorCode.innerHTML = "Error Code: 131202"
 			warningText.innerHTML = "Please enter a code <br> Press x to close this notice"
 		} else { // if there is a code it checks it with the following list
-			if(codeInput == "121231234"){ // with send you to the first stage on earth
+			if(codeInput == "121231234"){ // will send you to the first stage on earth
 				codeSelection = 0
 				console.log("good code")
+				goodCode = true
 				var warningText = document.getElementById("warningText")
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
@@ -302,6 +340,7 @@ function submitCode(){
 			} else if (codeInput == "othercode"){ // sends you to second stage on earth
 				codeSelection = 1
 				console.log("good code")
+				goodCode = true
 				var warningText = document.getElementById("warningText")
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
@@ -309,6 +348,7 @@ function submitCode(){
 			} else if (codeInput == "asdasd"){ // sends you to right before final boss battle
 				codeSelection = 2
 				console.log("good code")
+				goodCode = true
 				var warningText = document.getElementById("warningText")
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
@@ -316,6 +356,7 @@ function submitCode(){
 			} else if (codeInput == "entergodmodelmao"){ //gives you god mode
 				//give god mode
 				console.log("good code")
+				goodCode = true
 				var warningText = document.getElementById("warningText")
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
@@ -372,21 +413,21 @@ window.addEventListener('keyup', keyUpFunction)
 function keyUpFunction(keyboardEvent){
 	var keyUp = keyboardEvent.key
 	if (stage == 4){
-		if (keyUp == "w" || keyUp == "W"){ // release up key
+		if (keyUp == "ArrowUp"){ // release up key
 			movingUp = false
-			//console.log("w released")
+			//console.log("up released")
 		}
-		if (keyUp == "a" || keyUp == "A"){ // release left key
+		if (keyUp == "ArrowLeft"){ // release left key
 			moveingLeft = false
-			//console.log("a released")
+			//console.log("left released")
 		}
-		if (keyUp == "s" || keyUp == "S"){ // release down key
+		if (keyUp == "ArrowDown"){ // release down key
 			movingDown = false
-			//console.log("s released")
+			//console.log("down released")
 		}
-		if (keyUp == "d" || keyUp == "D"){ // release right key
+		if (keyUp == "ArrowRight"){ // release right key
 			movingRight = false
-			//console.log("d released")
+			//console.log("right released")
 		}
 		if (keyUp == 'z' || keyUp == 'Z'){
 			zPressed = false
@@ -398,23 +439,23 @@ function keyUpFunction(keyboardEvent){
 function inGameFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
 	if (stage == 4){ // this makes it only work in the game stage
-		if (keyDown == "w" || keyDown == "W"){ // press up key
+		if (keyDown == "ArrowUp"){ // press up key
 			movingUp = true
-			//console.log("w pressed")
+			//console.log("up pressed")
 		}
-		if (keyDown == "a" || keyDown == "A"){ // press left key
+		if (keyDown == "ArrowLeft"){ // press left key
 			movingLeft = true
 			lastPressed = 0
-			//console.log("a pressed")
+			//console.log("left pressed")
 		}
-		if (keyDown == "s" || keyDown == "S"){ // press down key
+		if (keyDown == "ArrowDown"){ // press down key
 			movingDown = true
-			//console.log("s pressed")
+			//console.log("down pressed")
 		}
-		if (keyDown == "d" || keyDown == "D"){ // press right key
+		if (keyDown == "ArrowRight"){ // press right key
 			movingRight = true
 			lastPressed = 1
-			//console.log("d pressed")
+			//console.log("right pressed")
 		}
 		if (keyDown == 'z' || keyDown == 'Z'){
 			zPressed = true
@@ -452,7 +493,7 @@ function keyDownFunction(keyboardEvent){
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
 				if (codeSelection == 0){ // start from the beginning
-
+					stage = 4
 				} else if (codeSelection == 1){ //start from stage one on earth
 
 				} else if (codeSelection == 2){ // start from stage two on earth
