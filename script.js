@@ -32,6 +32,10 @@ var zPressed = false
 // game variables
 var moveSpeed = 5 // movement
 var inventoryOpen = false
+var inventorySelection = 0
+
+var BGxPosition = 0
+var BGyPosition = 0
 
 //tutorial variables
 var tutorialScreen = 0
@@ -48,13 +52,13 @@ saveLoaded.src = 'mainMenuText/1ProgressLoaded.png'
 
 // images for the inventory
 var inventoryClosed = new Image()
-inventoryClosed.src = 'inventory'
+inventoryClosed.src = 'inventory/inventoryClosed.png'
 var inventoryTeam = new Image()
-inventoryTeam.src =
+inventoryTeam.src = 'inventory/inventoryTeamSelected.png'
 var inventoryItems = new Image()
-inventoryItems.src = 
+inventoryItems.src = 'inventory/inventoryItemsSelected.png'
 var inventorySave = new Image()
-inventorySave.src = 
+inventorySave.src = 'inventory/inventorySaveSelected.png'
 //#region main menu buttons + back
 // images and sources for each button   (s = selected, u = unselected)
 var playButtonS = new Image()
@@ -134,8 +138,8 @@ var P6 = new Image()
 P6.src = 'backgrounds/P6.png' // earth jungle
 //#endregion
 
-var testBG1 = new Image()
-testBG1.src = 'backgrounds/marsTest.png'
+var marsBackground = new Image()
+marsBackground.src = "backgrounds/marsTest.png"
 
 //starts the canvas when the window opensx
 window.onload=startCanvas
@@ -144,7 +148,7 @@ function startCanvas(){
 	isFullScreen = false
 	ctx=document.getElementById("myCanvas").getContext("2d")
 	//sets the framerate
-	timer = setInterval(updateCanvas, 20) 
+	timer = setInterval(updateCanvas, 20)
 }
 function updateCanvas(){
 	// reset the canvas
@@ -154,9 +158,10 @@ function updateCanvas(){
 	checkStage()
 	mainMenuText()
 	manageTutorial()
-	chracterFacing()
 	updateCode()
 	moveBackground()
+	manageInventory()
+	chracterFacing()
 }
 
 //#region tutorialthings
@@ -281,9 +286,65 @@ function checkStage(){
 			ctx.drawImage(saveLoaded,0,100,640,100)
 		}
 	}
+}
+ function manageInventory(){
+	if(stage == 4 || stage == 5 || stage == 6){ // only in active game states
+		if (!inventoryOpen){ // if the inventory isnt open
+			ctx.drawImage(inventoryClosed,0,0) // draw the image of it closed
+		}
+		else if (inventoryOpen){ // but if it is open
+			if (inventorySelection == 0){
+				ctx.drawImage(inventoryTeam,0,0)
+			} else if (inventorySelection == 1){
+				ctx.drawImage(inventoryItems,0,0)
+			} else if (inventorySelection == 2){
+				ctx.drawImage(inventorySave,0,0)
+			}
+		}
+	}
+ }
+
+function moveBackground(){
+	if (stage == 5){ // only works in the house
+
+	}
+	if (stage == 4){ // only works in the mars phase of the game
+		ctx.drawImage(marsBackground,BGxPosition, BGyPosition)
+		if (movingUp){
+			if (BGyPosition <= -5){ // if not touching the edge
+				BGyPosition = BGyPosition + moveSpeed // move the background
+			} else { // if it is
+				BGyPosition = BGyPosition // keep it the same
+			}
+		}
+		if(movingLeft){
+			if (BGxPosition <= -5){ // if not touching the edge
+				BGxPosition = BGxPosition + moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+		}
+		if(movingDown){
+			if (BGyPosition >= -2350){ // if not touching the edge
+				BGyPosition = BGyPosition - moveSpeed // move the background
+			} else { // if it is
+				BGyPosition = BGyPosition // keep it the same
+			}
+			
+		}
+		if(movingRight){
+			if (BGxPosition >= -2350){ // if not touching the edge
+				BGxPosition = BGxPosition - moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+			
+		}
+		console.log("bg X: " + BGxPosition)
+		console.log("bg Y: " + BGyPosition)
+	}
 
 }
-
 function chracterFacing(){
 	if (stage == 4){
 		if (lastPressed == 1){
@@ -294,30 +355,8 @@ function chracterFacing(){
 	}
 }
 
-function moveBackground(){
-	if (stage == 4){
-		var BGxPosition
-		var BGyPosition
-		ctx.drawImage(testBG1,BGxPosition,BGyPosition,3000,3000)
-		if (movingUp){
-			BGyPosition = BGyPosition - moveSpeed
-		}
-		if(movingLeft){
-			BGxPosition = BGxPosition - moveSpeed
-		}
-		if(movingDown){
-			BGyPosition = BGyPosition + moveSpeed
-		}
-		if(movingRight){
-			BGxPosition = BGxPosition + moveSpeed
-		}
-	}
-
-}
-
 function updateCode(){ // this just takes the input field in the html and puts it into a variable
 	codeInput = document.getElementById("enterCode").value
-	console.log(codeInput)
 }
 
 //#region codes
@@ -337,6 +376,8 @@ function submitCode(){
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
 				errorCode.innerHTML = ""
+				BGxPosition = 69 //change this
+				BGyPosition = 420 // and this
 			} else if (codeInput == "othercode"){ // sends you to second stage on earth
 				codeSelection = 1
 				console.log("good code")
@@ -345,6 +386,8 @@ function submitCode(){
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
 				errorCode.innerHTML = ""
+				BGxPosition = 420 // and this
+				BGyPosition = 69 // and this
 			} else if (codeInput == "asdasd"){ // sends you to right before final boss battle
 				codeSelection = 2
 				console.log("good code")
@@ -353,6 +396,8 @@ function submitCode(){
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
 				errorCode.innerHTML = ""
+				BGxPosition = 64 // and this
+				BGyPosition = 9020 // and even this
 			} else if (codeInput == "entergodmodelmao"){ //gives you god mode
 				//give god mode
 				console.log("good code")
@@ -412,13 +457,13 @@ window.addEventListener('keyup', keyUpFunction)
 
 function keyUpFunction(keyboardEvent){
 	var keyUp = keyboardEvent.key
-	if (stage == 4){
+	if (stage == 4 || stage == 5 || stage == 6){
 		if (keyUp == "ArrowUp"){ // release up key
 			movingUp = false
 			//console.log("up released")
 		}
 		if (keyUp == "ArrowLeft"){ // release left key
-			moveingLeft = false
+			movingLeft = false
 			//console.log("left released")
 		}
 		if (keyUp == "ArrowDown"){ // release down key
@@ -429,7 +474,7 @@ function keyUpFunction(keyboardEvent){
 			movingRight = false
 			//console.log("right released")
 		}
-		if (keyUp == 'z' || keyUp == 'Z'){
+		if (keyUp == 'z' || keyUp == 'Z'){ // release z key
 			zPressed = false
 			//console.log("z released")
 		}
@@ -438,28 +483,53 @@ function keyUpFunction(keyboardEvent){
 
 function inGameFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
-	if (stage == 4){ // this makes it only work in the game stage
+	if (stage == 4 || stage == 5 || stage == 6){ // this makes it only work in the game stage
 		if (keyDown == "ArrowUp"){ // press up key
 			movingUp = true
 			//console.log("up pressed")
-		}
-		if (keyDown == "ArrowLeft"){ // press left key
-			movingLeft = true
-			lastPressed = 0
-			//console.log("left pressed")
 		}
 		if (keyDown == "ArrowDown"){ // press down key
 			movingDown = true
 			//console.log("down pressed")
 		}
+		if (keyDown == "ArrowLeft"){ // press left key
+			if (!inventoryOpen){
+				movingLeft = true
+				lastPressed = 0
+				//console.log("left pressed")
+			} else if (inventoryOpen){
+				if (inventorySelection <= 0) // if the number is less than or equal to zero
+				{
+					inventorySelection = 0 // keep it at zero
+				} else {
+					inventorySelection-- // other wise decrease it
+				}
+			}
+		}
 		if (keyDown == "ArrowRight"){ // press right key
-			movingRight = true
-			lastPressed = 1
-			//console.log("right pressed")
+			if (!inventoryOpen){ // if inventory is closed
+				movingRight = true // move right
+				lastPressed = 1
+				//console.log("right pressed")
+			} else if (inventoryOpen){ // if its open
+				if (inventorySelection >= 2) // if the number is greater than or equal to two
+				{
+					inventorySelection = 2 // keep it the same
+				} else {
+					inventorySelection++ // otherwise incresae it
+				}
+			}
 		}
 		if (keyDown == 'z' || keyDown == 'Z'){
 			zPressed = true
 			//console.log("z pressed")
+		}
+		if (keyDown == 'i' || keyDown == 'I'){ // release i key
+			if (!inventoryOpen){ // if inventory is closed
+				inventoryOpen = true // open it
+			} else if (inventoryOpen){ // if inventory is open
+				inventoryOpen = false // close it
+			}
 		}
 	}
 }
@@ -541,4 +611,9 @@ function keyDownFunction(keyboardEvent){
 		}
 	}
 }
+window.addEventListener("keydown", function(e) { // this is something i learned from google to prevent scrolling and stuff like that
+    if(["Space","ArrowUp","ArrowDown"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+}, false);
 //#endregion
