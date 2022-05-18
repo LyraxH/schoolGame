@@ -1,5 +1,5 @@
 /**
-* Title: run very shoot shoot
+* Title: pokemon very cool
 * Author: Taison Shea
 * Date: 03/05/22
 * Version: 1
@@ -7,6 +7,10 @@
 
 **/
 
+const PLAYERWIDTH = 51
+const PLAYERHEIGHT = 74
+const PLAYERXPOSITION = 280
+const PLAYERYPOSITION = 180
 var WIDTH = 640
 var HEIGHT = 480
 var isFullScreen = false
@@ -30,12 +34,36 @@ var lastPressed = 0 // 0 = left 1 = right
 var zPressed = false
 
 // game variables
-var moveSpeed = 5 // movement
-var inventoryOpen = false
-var inventorySelection = 0
+var moveSpeed = 5 // how fast the play moves...
+var inventoryOpen = false // is the inventory open
+var inventorySelection = 0 // what is selected in the inventory
+var tvToggle = 0 // 0 = off 1 = on
 
 var BGxPosition = 0
 var BGyPosition = 0
+
+// variables for the house in the game
+var houseBackground = new Image()
+houseBackground.src = 'insideHouse/insidehouse.png'
+var houseDoor = new Image()
+houseDoor.src = 'insideHouse/door.png'
+var houseStairs = new Image()
+houseStairs.src = 'insideHouse/stairs.png'
+var houseBed = new Image()
+houseBed.src = 'insideHouse/bed.png'
+var tvOff = new Image()
+tvOff.src = 'insideHouse/tvOff.png'
+var tvOn = new Image()
+tvOn.src = 'insideHouse/tvOn.png'
+
+var bedXPosition = 0 // width = 210
+var bedYPosition = 0 // height = 102
+var tvXPosition = 0 // width = 225
+var tvYPosition = 0 // height = 141
+var stairsXPosition = 0 // width = 156
+var stairsYPosition = 0 // height = 93
+var doorXPosition = 0 // width = 165
+var doorYPosition = 0 // height = 27
 
 //tutorial variables
 var tutorialScreen = 0
@@ -141,14 +169,13 @@ P6.src = 'backgrounds/P6.png' // earth jungle
 var marsBackground = new Image()
 marsBackground.src = "backgrounds/marsTest.png"
 
-//starts the canvas when the window opensx
+//starts the canvas when the window opens
 window.onload=startCanvas
 
 function startCanvas(){
 	isFullScreen = false
 	ctx=document.getElementById("myCanvas").getContext("2d")
-	//sets the framerate
-	timer = setInterval(updateCanvas, 20)
+	timer = setInterval(updateCanvas, 20) // set framerate
 }
 function updateCanvas(){
 	// reset the canvas
@@ -156,12 +183,25 @@ function updateCanvas(){
 	ctx.fillRect(0,0,WIDTH, HEIGHT)
 	
 	checkStage()
+	manageMovement()
 	mainMenuText()
 	manageTutorial()
 	updateCode()
 	moveBackground()
 	manageInventory()
+	updateHousePositions()
+	houseThings()
+	detectBedCollision()
+	detectStairsCollision()
+	detectTVCollision()
+	detectDoorCollision()
 	chracterFacing()
+
+	ctx.strokeStyle = "rgb(0,255,0)" // Draw the hitboxes bright green
+	ctx.strokeRect(tvXPosition, tvYPosition, 225, 141)
+	ctx.strokeRect(bedXPosition, bedYPosition, 210, 102)
+	ctx.strokeRect(stairsXPosition, stairsYPosition, 156, 93)
+	ctx.strokeRect(doorXPosition, doorYPosition, 165, 27)
 }
 
 //#region tutorialthings
@@ -304,9 +344,48 @@ function checkStage(){
 	}
  }
 
+function manageMovement(){
+	if (((movingUp) && (movingLeft)) || ((movingUp) && (movingRight)) || ((movingUp) && (movingDown)) || ((movingLeft) && (movingRight)) || ((movingLeft) && (movingDown)) || ((movingRight) && (movingDown))){ // if any two movement keys are pressed, it will loewr the movement so its the same as if it was only one key pressed
+		moveSpeed = 3.7
+	} else {
+		moveSpeed = 5
+	}
+ }
 function moveBackground(){
 	if (stage == 5){ // only works in the house
-
+		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillRect(0,0,WIDTH,HEIGHT)
+		ctx.drawImage(houseBackground,BGxPosition, BGyPosition)
+		if (movingUp){
+			if (BGyPosition <= 170){ // if not touching the edge
+				BGyPosition = BGyPosition + moveSpeed // move the background
+			} else { // if it is
+				BGyPosition = BGyPosition // keep it the same
+			}
+		}
+		if(movingLeft){
+			if (BGxPosition <= 270){ // if not touching the edge
+				BGxPosition = BGxPosition + moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+		}
+		if(movingDown){
+			if (BGyPosition >= -330){ // if not touching the edge
+				BGyPosition = BGyPosition - moveSpeed // move the background
+			} else { // if it is
+				BGyPosition = BGyPosition // keep it the same
+			}
+			
+		}
+		if(movingRight){
+			if (BGxPosition >= -560){ // if not touching the edge
+				BGxPosition = BGxPosition - moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+			
+		}
 	}
 	if (stage == 4){ // only works in the mars phase of the game
 		ctx.drawImage(marsBackground,BGxPosition, BGyPosition)
@@ -340,23 +419,96 @@ function moveBackground(){
 			}
 			
 		}
-		console.log("bg X: " + BGxPosition)
-		console.log("bg Y: " + BGyPosition)
+		//console.log("bg X: " + BGxPosition)
+		//console.log("bg Y: " + BGyPosition)
 	}
+}
 
+function updateHousePositions(){
+	bedXPosition = BGxPosition + 690
+	bedYPosition = BGyPosition + 130
+	tvXPosition = BGxPosition + 50
+	tvYPosition = BGyPosition
+	stairsXPosition = BGxPosition + 380
+	stairsYPosition = BGyPosition
+	doorXPosition = BGxPosition + 355
+	doorYPosition = BGyPosition + 575
+}
+function houseThings(){
+	if (stage == 5){
+		ctx.drawImage(houseDoor, doorXPosition, doorYPosition)
+		ctx.drawImage(houseBed, bedXPosition, bedYPosition)
+		ctx.drawImage(houseStairs, stairsXPosition, stairsYPosition)
+		if (tvToggle == 0){
+			ctx.drawImage(tvOff, tvXPosition, tvYPosition)
+		} else if (tvToggle == 1){
+			ctx.drawImage(tvOn, tvXPosition, tvYPosition)
+		}
+	}
+}
+
+//#region house object collisions
+function detectBedCollision(){
+	if (stage == 5){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= bedXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= bedYPosition && PLAYERXPOSITION <= bedXPosition + 210 && PLAYERYPOSITION <= bedYPosition + 102)
+		{
+			//console.log("touching bed")
+			return(true)
+		}else{
+			//console.log("not touching bed")
+			return(false)
+		}
+	}
+}
+function detectTVCollision(){
+	if (stage == 5){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= tvXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= tvYPosition && PLAYERXPOSITION <= tvXPosition + 225 && PLAYERYPOSITION <= tvYPosition + 141)
+		{
+			//console.log("touching tv")
+			return(true)
+		}else{
+			//console.log("not touching tv")
+			return(false)
+		}
+	}
+}
+function detectStairsCollision(){
+	if (stage == 5){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= stairsXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= stairsYPosition && PLAYERXPOSITION <= stairsXPosition + 210 && PLAYERYPOSITION <= stairsYPosition + 102)
+		{
+			//console.log("touching stairs")
+			return(true)
+		}else{
+			//console.log("not touching stairs")
+			return(false)
+		}
+	}
+}
+function detectDoorCollision(){
+	if (stage == 5){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= doorXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= doorYPosition && PLAYERXPOSITION <= doorXPosition + 165 && PLAYERYPOSITION <= doorYPosition + 27)
+		{
+			//console.log("touching door")
+			return(true)
+		}else{
+			//console.log("not touching door")
+			return(false)
+		}
+	}
 }
 function chracterFacing(){
-	if (stage == 4){
+	if (stage == 4 || stage == 5){
 		if (lastPressed == 1){
-			ctx.drawImage(astronautRight,280,180,51,74)
+			ctx.drawImage(astronautRight,PLAYERXPOSITION,PLAYERYPOSITION,PLAYERWIDTH,PLAYERHEIGHT)
 		} else if (lastPressed == 0){
-			ctx.drawImage(astronautLeft,280,180,51,74)
+			ctx.drawImage(astronautLeft,PLAYERXPOSITION,PLAYERYPOSITION,PLAYERWIDTH,PLAYERHEIGHT)
 		}
 	}
 }
 
 function updateCode(){ // this just takes the input field in the html and puts it into a variable
 	codeInput = document.getElementById("enterCode").value
+	//console.log(codeInput)
 }
 
 //#region codes
@@ -521,7 +673,35 @@ function inGameFunction(keyboardEvent){
 			}
 		}
 		if (keyDown == 'z' || keyDown == 'Z'){
-			zPressed = true
+			if (inventoryOpen){ // if inventory is open
+				if (inventorySelection == 0) { // open team
+					// open team menu
+				} else if (inventorySelection == 1) { // open items
+					//open items menu
+				} else if (inventorySelection == 2) { // save game
+					// give save code based off what stage you are on
+				}
+			} else if (!inventoryOpen) { // if inventory is closed
+				if (stage == 5){ // if in the house
+					if (detectBedCollision()){// if touching bed
+						// give the bed diologue.
+						console.log("Want to sleep little cry boy")
+					}
+					if (detectStairsCollision()){ // if touching stairs
+						console.log("The second floor hasnt been built yet. Please come back later")
+					}
+					if (detectDoorCollision()){ // if touching door
+						console.log("want to go outside")
+					}
+					if (detectTVCollision()){// if touching tv
+						if (tvToggle == 1){
+							tvToggle = 0
+						} else if (tvToggle == 0){
+							tvToggle = 1
+						}
+					}
+				}
+			}
 			//console.log("z pressed")
 		}
 		if (keyDown == 'i' || keyDown == 'I'){ // release i key
@@ -563,7 +743,7 @@ function keyDownFunction(keyboardEvent){
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
 				if (codeSelection == 0){ // start from the beginning
-					stage = 4
+					stage = 5
 				} else if (codeSelection == 1){ //start from stage one on earth
 
 				} else if (codeSelection == 2){ // start from stage two on earth
