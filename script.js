@@ -38,6 +38,7 @@ var moveSpeed = 5 // how fast the play moves...
 var inventoryOpen = false // is the inventory open
 var inventorySelection = 0 // what is selected in the inventory
 var tvToggle = 0 // 0 = off 1 = on
+var dialogueOpen = false																																																																																																																																																																																																																																																																							
 
 var BGxPosition = 0
 var BGyPosition = 0
@@ -64,6 +65,17 @@ var stairsXPosition = 0 // width = 156
 var stairsYPosition = 0 // height = 93
 var doorXPosition = 0 // width = 165
 var doorYPosition = 0 // height = 27
+
+// variables used for mars in the game
+var marsHouseDoor = new Image()
+marsHouseDoor.src = 'mars/yourHosueDoor.png'
+var marsFoodCafe = new Image()
+marsFoodCafe.src = 'mars/buyFromCafe.png'
+
+var marsDoorXPosition = 0 // width = 133
+var marsDoorYPosition = 0 // height = 200
+var cafeXPosition = 0 // width = 263
+var cafeYPosition = 0 // height = 148
 
 //tutorial variables
 var tutorialScreen = 0
@@ -188,13 +200,20 @@ function updateCanvas(){
 	manageTutorial()
 	updateCode()
 	moveBackground()
-	manageInventory()
 	updateHousePositions()
 	houseThings()
 	detectBedCollision()
 	detectStairsCollision()
 	detectTVCollision()
 	detectDoorCollision()
+	updateMarsPositions()
+	marsThings()
+	manageInventory()
+
+
+
+
+
 	chracterFacing()
 
 	ctx.strokeStyle = "rgb(0,255,0)" // Draw the hitboxes bright green
@@ -202,6 +221,8 @@ function updateCanvas(){
 	ctx.strokeRect(bedXPosition, bedYPosition, 210, 102)
 	ctx.strokeRect(stairsXPosition, stairsYPosition, 156, 93)
 	ctx.strokeRect(doorXPosition, doorYPosition, 165, 27)
+	ctx.strokeRect(marsDoorXPosition,marsDoorYPosition, 133, 200)
+	ctx.strokeRect(cafeXPosition, cafeYPosition,263, 148)
 }
 
 //#region tutorialthings
@@ -388,6 +409,8 @@ function moveBackground(){
 		}
 	}
 	if (stage == 4){ // only works in the mars phase of the game
+		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillRect(0,0,WIDTH,HEIGHT)
 		ctx.drawImage(marsBackground,BGxPosition, BGyPosition)
 		if (movingUp){
 			if (BGyPosition <= -5){ // if not touching the edge
@@ -446,6 +469,19 @@ function houseThings(){
 		}
 	}
 }
+function updateMarsPositions(){
+	marsDoorXPosition = BGxPosition +  2460
+	marsDoorYPosition = BGyPosition + 560
+	cafeXPosition = BGxPosition + 570
+	cafeYPosition = BGyPosition + 1633
+}
+function marsThings(){
+	if (stage == 4){
+		ctx.drawImage(marsHouseDoor, marsDoorXPosition, marsDoorYPosition)
+		ctx.drawImage(marsFoodCafe, cafeXPosition, cafeYPosition)
+	}
+}
+
 
 //#region house object collisions
 function detectBedCollision(){
@@ -496,6 +532,7 @@ function detectDoorCollision(){
 		}
 	}
 }
+//#endregion
 function chracterFacing(){
 	if (stage == 4 || stage == 5){
 		if (lastPressed == 1){
@@ -505,7 +542,6 @@ function chracterFacing(){
 		}
 	}
 }
-
 function updateCode(){ // this just takes the input field in the html and puts it into a variable
 	codeInput = document.getElementById("enterCode").value
 	//console.log(codeInput)
@@ -636,49 +672,58 @@ function keyUpFunction(keyboardEvent){
 function inGameFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
 	if (stage == 4 || stage == 5 || stage == 6){ // this makes it only work in the game stage
-		if (keyDown == "ArrowUp"){ // press up key
-			movingUp = true
-			//console.log("up pressed")
-		}
-		if (keyDown == "ArrowDown"){ // press down key
-			movingDown = true
-			//console.log("down pressed")
-		}
-		if (keyDown == "ArrowLeft"){ // press left key
-			if (!inventoryOpen){
-				movingLeft = true
-				lastPressed = 0
-				//console.log("left pressed")
-			} else if (inventoryOpen){
-				if (inventorySelection <= 0) // if the number is less than or equal to zero
-				{
-					inventorySelection = 0 // keep it at zero
-				} else {
-					inventorySelection-- // other wise decrease it
+		if (!dialogueOpen){ 
+			if (keyDown == "ArrowUp"){ // press up key
+				if (!inventoryOpen){
+					movingUp = true
+				}
+				//console.log("up pressed")
+			}
+			if (keyDown == "ArrowDown"){ // press down key
+				if(!inventoryOpen){
+					movingDown = true
+				}
+				//console.log("down pressed")
+			}
+			if (keyDown == "ArrowLeft"){ // press left key
+				if (!inventoryOpen){
+					movingLeft = true
+					lastPressed = 0
+					//console.log("left pressed")
+				} else if (inventoryOpen){
+					if (inventorySelection <= 0) // if the number is less than or equal to zero
+					{
+						inventorySelection = 0 // keep it at zero
+					} else {
+						inventorySelection-- // other wise decrease it
+					}
 				}
 			}
-		}
-		if (keyDown == "ArrowRight"){ // press right key
-			if (!inventoryOpen){ // if inventory is closed
-				movingRight = true // move right
-				lastPressed = 1
-				//console.log("right pressed")
-			} else if (inventoryOpen){ // if its open
-				if (inventorySelection >= 2) // if the number is greater than or equal to two
-				{
-					inventorySelection = 2 // keep it the same
-				} else {
-					inventorySelection++ // otherwise incresae it
+			if (keyDown == "ArrowRight"){ // press right key
+				if (!inventoryOpen){ // if inventory is closed
+					movingRight = true // move right
+					lastPressed = 1
+					//console.log("right pressed")
+				} else if (inventoryOpen){ // if its open
+					if (inventorySelection >= 2) // if the number is greater than or equal to two
+					{
+						inventorySelection = 2 // keep it the same
+					} else {
+						inventorySelection++ // otherwise incresae it
+					}
 				}
 			}
-		}
+		} 
 		if (keyDown == 'z' || keyDown == 'Z'){
 			if (inventoryOpen){ // if inventory is open
 				if (inventorySelection == 0) { // open team
+					console.log("go to team")
 					// open team menu
 				} else if (inventorySelection == 1) { // open items
+					console.log("go to items")
 					//open items menu
 				} else if (inventorySelection == 2) { // save game
+					console.log("save game")
 					// give save code based off what stage you are on
 				}
 			} else if (!inventoryOpen) { // if inventory is closed
@@ -692,6 +737,9 @@ function inGameFunction(keyboardEvent){
 					}
 					if (detectDoorCollision()){ // if touching door
 						console.log("want to go outside")
+						BGxPosition = -2187
+						BGyPosition = -450
+						stage = 4
 					}
 					if (detectTVCollision()){// if touching tv
 						if (tvToggle == 1){
