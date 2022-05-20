@@ -38,7 +38,15 @@ var moveSpeed = 5 // how fast the play moves...
 var inventoryOpen = false // is the inventory open
 var inventorySelection = 0 // what is selected in the inventory
 var tvToggle = 0 // 0 = off 1 = on
-var dialogueOpen = false																																																																																																																																																																																																																																																																							
+var dialogueOpen = false
+var diologueNumber = 0
+//#region diologue Numbers
+// 0 = cant go upstairs in house
+// 1 = go to sleep
+// 2 = 						
+//#endregion
+var dia0 = new Image()
+dia0.src = 'dialogue/dia0.png'																																																																																																																																																																																																																																																																	
 
 var BGxPosition = 0
 var BGyPosition = 0
@@ -80,7 +88,7 @@ var cafeYPosition = 0 // height = 148
 //tutorial variables
 var tutorialScreen = 0
 
-// below is the image variables
+// image variables for main menu
 var backgroundMenu = new Image() // background for the main menu
 backgroundMenu.src = 'backgrounds/earth.png'
 var backgroundCode = new Image() // background for Enter Code
@@ -99,6 +107,10 @@ var inventoryItems = new Image()
 inventoryItems.src = 'inventory/inventoryItemsSelected.png'
 var inventorySave = new Image()
 inventorySave.src = 'inventory/inventorySaveSelected.png'
+
+// extra images
+var interactButton = new Image()
+interactButton.src = 'extraResources/interactButton.png'
 //#region main menu buttons + back
 // images and sources for each button   (s = selected, u = unselected)
 var playButtonS = new Image()
@@ -204,12 +216,13 @@ function updateCanvas(){
 	houseThings()
 	detectBedCollision()
 	detectStairsCollision()
-	detectTVCollision()
+	detectTVCollision()	
 	detectDoorCollision()
-	updateMarsPositions()
 	marsThings()
+	detectMarsDoorCollision()
+	detectCafeCollision()
+	updateMarsPositions()
 	manageInventory()
-
 
 
 
@@ -446,7 +459,6 @@ function moveBackground(){
 		//console.log("bg Y: " + BGyPosition)
 	}
 }
-
 function updateHousePositions(){
 	bedXPosition = BGxPosition + 690
 	bedYPosition = BGyPosition + 130
@@ -470,8 +482,8 @@ function houseThings(){
 	}
 }
 function updateMarsPositions(){
-	marsDoorXPosition = BGxPosition +  2460
-	marsDoorYPosition = BGyPosition + 560
+	marsDoorXPosition = BGxPosition +  2410
+	marsDoorYPosition = BGyPosition + 559
 	cafeXPosition = BGxPosition + 570
 	cafeYPosition = BGyPosition + 1633
 }
@@ -482,12 +494,40 @@ function marsThings(){
 	}
 }
 
-
+//#region mars object collisions
+function detectMarsDoorCollision(){
+	if (stage == 4){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= marsDoorXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= marsDoorYPosition && PLAYERXPOSITION <= marsDoorXPosition + 133 && PLAYERYPOSITION <= marsDoorYPosition + 200)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			//console.log("touching mars door")
+			return(true)
+		}else{
+			//console.log("not touching mars door")
+			return(false)
+		}
+	}
+}
+function detectCafeCollision(){
+	if (stage == 4){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= cafeXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= cafeYPosition && PLAYERXPOSITION <= cafeXPosition + 263 && PLAYERYPOSITION <= cafeYPosition + 148)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			//console.log("touching bed")
+			return(true)
+		}else{
+			//console.log("not touching bed")
+			return(false)
+		}
+	}
+}
+//#endregion
 //#region house object collisions
 function detectBedCollision(){
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= bedXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= bedYPosition && PLAYERXPOSITION <= bedXPosition + 210 && PLAYERYPOSITION <= bedYPosition + 102)
 		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
 			//console.log("touching bed")
 			return(true)
 		}else{
@@ -500,23 +540,27 @@ function detectTVCollision(){
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= tvXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= tvYPosition && PLAYERXPOSITION <= tvXPosition + 225 && PLAYERYPOSITION <= tvYPosition + 141)
 		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
 			//console.log("touching tv")
 			return(true)
 		}else{
 			//console.log("not touching tv")
 			return(false)
+			
 		}
 	}
 }
 function detectStairsCollision(){
 	if (stage == 5){
-		if(PLAYERXPOSITION + PLAYERWIDTH >= stairsXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= stairsYPosition && PLAYERXPOSITION <= stairsXPosition + 210 && PLAYERYPOSITION <= stairsYPosition + 102)
+		if(PLAYERXPOSITION + PLAYERWIDTH >= stairsXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= stairsYPosition && PLAYERXPOSITION <= stairsXPosition + 156 && PLAYERYPOSITION <= stairsYPosition + 93)
 		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
 			//console.log("touching stairs")
 			return(true)
 		}else{
 			//console.log("not touching stairs")
 			return(false)
+			
 		}
 	}
 }
@@ -524,11 +568,14 @@ function detectDoorCollision(){
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= doorXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= doorYPosition && PLAYERXPOSITION <= doorXPosition + 165 && PLAYERYPOSITION <= doorYPosition + 27)
 		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
 			//console.log("touching door")
 			return(true)
+			
 		}else{
 			//console.log("not touching door")
 			return(false)
+			
 		}
 	}
 }
@@ -737,7 +784,7 @@ function inGameFunction(keyboardEvent){
 					}
 					if (detectDoorCollision()){ // if touching door
 						console.log("want to go outside")
-						BGxPosition = -2187
+						BGxPosition = -2050
 						BGyPosition = -450
 						stage = 4
 					}
@@ -748,15 +795,27 @@ function inGameFunction(keyboardEvent){
 							tvToggle = 1
 						}
 					}
+				} else if (stage == 4) { // if on mars
+					if (detectMarsDoorCollision()){
+						console.log("go back inside")
+						stage = 5
+						BGxPosition = -130
+						BGyPosition = -340
+					}
+					if (detectCafeCollision()){
+						console.log("i give you good deal on coffe and biscuits")
+					}
 				}
 			}
 			//console.log("z pressed")
 		}
-		if (keyDown == 'i' || keyDown == 'I'){ // release i key
-			if (!inventoryOpen){ // if inventory is closed
-				inventoryOpen = true // open it
-			} else if (inventoryOpen){ // if inventory is open
-				inventoryOpen = false // close it
+		if (!dialogueOpen){
+			if (keyDown == 'i' || keyDown == 'I'){ // release i key
+				if (!inventoryOpen){ // if inventory is closed
+					inventoryOpen = true // open it
+				} else if (inventoryOpen){ // if inventory is open
+					inventoryOpen = false // close it
+				}
 			}
 		}
 	}
