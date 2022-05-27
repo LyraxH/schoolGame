@@ -39,17 +39,23 @@ var inventoryOpen = false // is the inventory open
 var inventorySelection = 0 // what is selected in the inventory
 var tvToggle = 0 // 0 = off 1 = on
 var dialogueOpen = false
+var toggleNote = false
 var diologueNumber = 0
 //#region diologue Numbers
 // 0 = cant go upstairs in house
 // 1 = go to sleep
-// 2 = 						
+// 2 = the note on the desk
+// 3 = cant go to sleep
 //#endregion
 var dia0 = new Image()
-dia0.src = 'dialogue/dia0.png'																																																																																																																																																																																																																																																																	
+dia0.src = 'dialogue/dia0.png'
+var dia3 = new Image()
+dia3.src = 'dialogue/dia3.png'
+
 
 var BGxPosition = 0
 var BGyPosition = 0
+var startingStage = 0
 
 // variables for the house in the game
 var houseBackground = new Image()
@@ -64,6 +70,10 @@ var tvOff = new Image()
 tvOff.src = 'insideHouse/tvOff.png'
 var tvOn = new Image()
 tvOn.src = 'insideHouse/tvOn.png'
+var deskWithNote = new Image()
+deskWithNote.src = 'insideHouse/DeskWithNote.png'
+var note = new Image()
+note.src = 'insideHouse/Note.png'
 
 var bedXPosition = 0 // width = 210
 var bedYPosition = 0 // height = 102
@@ -73,17 +83,23 @@ var stairsXPosition = 0 // width = 156
 var stairsYPosition = 0 // height = 93
 var doorXPosition = 0 // width = 165
 var doorYPosition = 0 // height = 27
+var deskXPosition = 0 // width = 182
+var deskYPosition = 0 // height = 54
 
 // variables used for mars in the game
 var marsHouseDoor = new Image()
 marsHouseDoor.src = 'mars/yourHosueDoor.png'
 var marsFoodCafe = new Image()
 marsFoodCafe.src = 'mars/buyFromCafe.png'
+var lieutenant = new Image()
+lieutenant.src = 'characters/lieutenant.png'
 
 var marsDoorXPosition = 0 // width = 133
 var marsDoorYPosition = 0 // height = 200
 var cafeXPosition = 0 // width = 263
 var cafeYPosition = 0 // height = 148
+var lieutenantXPosition = 0 // width = 92
+var lieutenantYPosition = 0 // height = 127
 
 //tutorial variables
 var tutorialScreen = 0
@@ -173,6 +189,12 @@ var astronautLeft = new Image()
 astronautLeft.src = 'characters/astronautLeft.png'
 var astronautRight = new Image()
 astronautRight.src = 'characters/astronautRight.png'
+var zombieIdle = new Image()
+zombieIdle.src = 'zombies/zombie_idle.png'
+var zombieFlex = new Image()
+zombieFlex.src = 'zombies/zombie_flex.png'
+var zombieMoving = new Image()
+zombieMoving.src = 'zombies/zombie_moving.png'
 //#endregion
 
 //#region lore backgrounds
@@ -188,6 +210,9 @@ var P5 = new Image()
 P5.src = 'backgrounds/P5.png' // mars
 var P6 = new Image()
 P6.src = 'backgrounds/P6.png' // earth jungle
+
+var battle = new Image()
+battle.src = 'ExtraResources/Battle.png'
 //#endregion
 
 var marsBackground = new Image()
@@ -218,24 +243,27 @@ function updateCanvas(){
 	detectStairsCollision()
 	detectTVCollision()	
 	detectDoorCollision()
+	detectDeskCollision()
 	marsThings()
 	detectMarsDoorCollision()
 	detectCafeCollision()
 	updateMarsPositions()
 	manageInventory()
 
-
-
+	//console.log(zPressed) //this is my testing console.log
 
 	chracterFacing()
+	toggleNoteF()
 
 	ctx.strokeStyle = "rgb(0,255,0)" // Draw the hitboxes bright green
-	ctx.strokeRect(tvXPosition, tvYPosition, 225, 141)
-	ctx.strokeRect(bedXPosition, bedYPosition, 210, 102)
-	ctx.strokeRect(stairsXPosition, stairsYPosition, 156, 93)
-	ctx.strokeRect(doorXPosition, doorYPosition, 165, 27)
-	ctx.strokeRect(marsDoorXPosition,marsDoorYPosition, 133, 200)
-	ctx.strokeRect(cafeXPosition, cafeYPosition,263, 148)
+	ctx.strokeRect(tvXPosition, tvYPosition, 225, 141) // tv
+	ctx.strokeRect(bedXPosition, bedYPosition, 210, 102) // bed
+	ctx.strokeRect(stairsXPosition, stairsYPosition, 156, 93) // stairs
+	ctx.strokeRect(doorXPosition, doorYPosition, 165, 27) // door
+	ctx.strokeRect(marsDoorXPosition,marsDoorYPosition, 133, 200) // mars
+	ctx.strokeRect(cafeXPosition, cafeYPosition,263, 148) // cafe
+	ctx.strokeRect(deskXPosition, deskYPosition, 182, 54) // desk
+	ctx.strokeRect(lieutenantXPosition,lieutenantYPosition,PLAYERWIDTH,PLAYERHEIGHT)
 }
 
 //#region tutorialthings
@@ -359,9 +387,11 @@ function checkStage(){
 		if (goodCode){
 			ctx.drawImage(saveLoaded,0,100,640,100)
 		}
+	} else if (stage == 69){
+		ctx.drawImage(battle, 0,0,WIDTH,HEIGHT)
 	}
 }
- function manageInventory(){
+function manageInventory(){
 	if(stage == 4 || stage == 5 || stage == 6){ // only in active game states
 		if (!inventoryOpen){ // if the inventory isnt open
 			ctx.drawImage(inventoryClosed,0,0) // draw the image of it closed
@@ -468,12 +498,15 @@ function updateHousePositions(){
 	stairsYPosition = BGyPosition
 	doorXPosition = BGxPosition + 355
 	doorYPosition = BGyPosition + 575
+	deskXPosition = BGxPosition + 590
+	deskYPosition = BGyPosition
 }
 function houseThings(){
 	if (stage == 5){
 		ctx.drawImage(houseDoor, doorXPosition, doorYPosition)
 		ctx.drawImage(houseBed, bedXPosition, bedYPosition)
 		ctx.drawImage(houseStairs, stairsXPosition, stairsYPosition)
+		ctx.drawImage(deskWithNote, deskXPosition, deskYPosition)
 		if (tvToggle == 0){
 			ctx.drawImage(tvOff, tvXPosition, tvYPosition)
 		} else if (tvToggle == 1){
@@ -481,16 +514,47 @@ function houseThings(){
 		}
 	}
 }
+function toggleNoteF(){
+	if (stage == 5){
+		if (toggleNote == true){
+			if (diologueNumber == 2){
+				ctx.drawImage(note,0,0,WIDTH,HEIGHT)
+				setTimeout(() => {checkZ();}, 250)
+			} else if (diologueNumber == 0){
+				ctx.drawImage(dia0,0,0, WIDTH,HEIGHT)
+				console.log("Second floor")
+				setTimeout(() => {checkZ();}, 250)
+			} else if (diologueNumber == 1){
+
+			} else if (diologueNumber == 3){
+				ctx.drawImage(dia3, 0,0,WIDTH,HEIGHT)
+				setTimeout(() => {checkZ();}, 250)
+			}
+		}
+		else {
+			return;
+		}
+	}
+}
+function checkZ(){
+	if (zPressed == true){
+		toggleNote = false
+		dialogueOpen = false
+	}
+}
 function updateMarsPositions(){
 	marsDoorXPosition = BGxPosition +  2410
 	marsDoorYPosition = BGyPosition + 559
 	cafeXPosition = BGxPosition + 570
 	cafeYPosition = BGyPosition + 1633
+	lieutenantXPosition = BGxPosition + 2200
+	lieutenantYPosition = BGyPosition + 2500
 }
 function marsThings(){
 	if (stage == 4){
 		ctx.drawImage(marsHouseDoor, marsDoorXPosition, marsDoorYPosition)
 		ctx.drawImage(marsFoodCafe, cafeXPosition, cafeYPosition)
+		ctx.drawImage(lieutenant, lieutenantXPosition, lieutenantYPosition, PLAYERWIDTH, PLAYERHEIGHT)
 	}
 }
 
@@ -504,6 +568,19 @@ function detectMarsDoorCollision(){
 			return(true)
 		}else{
 			//console.log("not touching mars door")
+			return(false)
+		}
+	}
+}
+function detectLieutenantCollision(){
+	if (stage == 4){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= lieutenantXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= lieutenantYPosition && PLAYERXPOSITION <= lieutenantXPosition + PLAYERWIDTH && PLAYERYPOSITION <= lieutenantYPosition + PLAYERHEIGHT)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			console.log("touching lieutenant")
+			return(true)
+		}else{
+			console.log("not touching lieutenant")
 			return(false)
 		}
 	}
@@ -523,6 +600,19 @@ function detectCafeCollision(){
 }
 //#endregion
 //#region house object collisions
+function detectDeskCollision(){
+	if (stage == 5){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= deskXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= deskYPosition && PLAYERXPOSITION <= deskXPosition + 182 && PLAYERYPOSITION <= deskYPosition + 54)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			//console.log("touching bed")
+			return(true)
+		}else{
+			//console.log("not touching bed")
+			return(false)
+		}
+	}
+}
 function detectBedCollision(){
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= bedXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= bedYPosition && PLAYERXPOSITION <= bedXPosition + 210 && PLAYERYPOSITION <= bedYPosition + 102)
@@ -604,7 +694,7 @@ function submitCode(){
 			warningText.innerHTML = "Please enter a code <br> Press x to close this notice"
 		} else { // if there is a code it checks it with the following list
 			if(codeInput == "121231234"){ // will send you to the first stage on earth
-				codeSelection = 0
+				startingStage = 1
 				console.log("good code")
 				goodCode = true
 				var warningText = document.getElementById("warningText")
@@ -614,7 +704,7 @@ function submitCode(){
 				BGxPosition = 69 //change this
 				BGyPosition = 420 // and this
 			} else if (codeInput == "othercode"){ // sends you to second stage on earth
-				codeSelection = 1
+				startingStage = 2
 				console.log("good code")
 				goodCode = true
 				var warningText = document.getElementById("warningText")
@@ -624,7 +714,7 @@ function submitCode(){
 				BGxPosition = 420 // and this
 				BGyPosition = 69 // and this
 			} else if (codeInput == "asdasd"){ // sends you to right before final boss battle
-				codeSelection = 2
+				startingStage = 3
 				console.log("good code")
 				goodCode = true
 				var warningText = document.getElementById("warningText")
@@ -762,6 +852,7 @@ function inGameFunction(keyboardEvent){
 			}
 		} 
 		if (keyDown == 'z' || keyDown == 'Z'){
+			zPressed = true
 			if (inventoryOpen){ // if inventory is open
 				if (inventorySelection == 0) { // open team
 					console.log("go to team")
@@ -770,17 +861,28 @@ function inGameFunction(keyboardEvent){
 					console.log("go to items")
 					//open items menu
 				} else if (inventorySelection == 2) { // save game
-					console.log("save game")
-					// give save code based off what stage you are on
+					if (stage == 5){
+						console.log("Its too early to save now")
+					} else if (stage == 6){
+						console.log("Saved Stage: Give code: 121231234")
+					} else if (stage == 7){
+						console.log("Saved Stage: Give code: othercode")
+					} else if (stage == 8){
+						console.log("Saved Stage: Give code: asdasd")
+					}
 				}
 			} else if (!inventoryOpen) { // if inventory is closed
 				if (stage == 5){ // if in the house
 					if (detectBedCollision()){// if touching bed
-						// give the bed diologue.
-						console.log("Want to sleep little cry boy")
+						toggleNote = true
+						dialogueOpen = true
+						diologueNumber = 3
 					}
 					if (detectStairsCollision()){ // if touching stairs
-						console.log("The second floor hasnt been built yet. Please come back later")
+						//console.log("The second floor hasnt been built yet. Please come back later")
+						toggleNote = true
+						dialogueOpen = true
+						diologueNumber = 0
 					}
 					if (detectDoorCollision()){ // if touching door
 						console.log("want to go outside")
@@ -794,6 +896,12 @@ function inGameFunction(keyboardEvent){
 						} else if (tvToggle == 0){
 							tvToggle = 1
 						}
+					}
+					if (detectDeskCollision()){
+						console.log("open the note on the desk")
+						diologueNumber = 2
+						dialogueOpen = true
+						toggleNote = true
 					}
 				} else if (stage == 4) { // if on mars
 					if (detectMarsDoorCollision()){
@@ -820,10 +928,11 @@ function inGameFunction(keyboardEvent){
 		}
 	}
 }
-
-
 function keyDownFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
+	if (keyDown == 'o'){
+		stage = 69 // the test scene for the game, i just wanna make sure it works
+	}
 	if (keyDown == 'x' || keyDown == 'X'){
 		var warningText = document.getElementById("warningText")
 		var errorCode = document.getElementById("errorCode")
@@ -849,11 +958,15 @@ function keyDownFunction(keyboardEvent){
 		}	
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
 			if(playerSelection == 0){
-				if (codeSelection == 0){ // start from the beginning
+				if (startingStage == 0){
+					BGxPosition = -500
+					BGyPosition = 130
 					stage = 5
-				} else if (codeSelection == 1){ //start from stage one on earth
+				} else if (startingStage == 1){ // start from stage three earth
+					stage = 6
+				} else if (startingStage == 2){ //start from stage two earth
 
-				} else if (codeSelection == 2){ // start from stage two on earth
+				} else if (startingStage == 3){ // start from right before boss battle
 
 				}
 			} else if (playerSelection == 1){ // go to tutorial
