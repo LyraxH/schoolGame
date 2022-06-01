@@ -41,18 +41,30 @@ var tvToggle = 0 // 0 = off 1 = on
 var dialogueOpen = false
 var toggleNote = false
 var diologueNumber = 0
+var yesOrNo = 1
+var yesOrNoOpen = false
 //#region diologue Numbers
 // 0 = cant go upstairs in house
 // 1 = go to sleep
 // 2 = the note on the desk
 // 3 = cant go to sleep
+// 4 = want to go to earth
+// 5 = come back when youre ready (to go to earth)
 //#endregion
+var contiunedDialogue = 0
 var dia0 = new Image()
 dia0.src = 'dialogue/dia0.png'
 var dia3 = new Image()
 dia3.src = 'dialogue/dia3.png'
+var dia4 = new Image()
+dia4.src = 'dialogue/dia4.png'
+var dia5 = new Image()
+dia5.src = 'dialogue/dia5.png'
 
-
+var yesReady = new Image()
+yesReady.src = 'dialogue/yesReady.png'
+var noReady = new Image()
+noReady.src = 'dialogue/noReady.png'
 var BGxPosition = 0
 var BGyPosition = 0
 var startingStage = 0
@@ -217,6 +229,8 @@ battle.src = 'ExtraResources/Battle.png'
 
 var marsBackground = new Image()
 marsBackground.src = "backgrounds/marsTest.png"
+var earthBackground = new Image()
+earthBackground.src = 'backgrounds/earthTest.png'
 
 //starts the canvas when the window opens
 window.onload=startCanvas
@@ -247,25 +261,43 @@ function updateCanvas(){
 	marsThings()
 	detectMarsDoorCollision()
 	detectCafeCollision()
+	detectLieutenantCollision()
 	updateMarsPositions()
 	manageInventory()
 
 	//console.log(zPressed) //this is my testing console.log
-
+	console.log(yesOrNo)
 	chracterFacing()
+	yesOrNoF()
 	toggleNoteF()
 
 	ctx.strokeStyle = "rgb(0,255,0)" // Draw the hitboxes bright green
-	ctx.strokeRect(tvXPosition, tvYPosition, 225, 141) // tv
-	ctx.strokeRect(bedXPosition, bedYPosition, 210, 102) // bed
-	ctx.strokeRect(stairsXPosition, stairsYPosition, 156, 93) // stairs
-	ctx.strokeRect(doorXPosition, doorYPosition, 165, 27) // door
-	ctx.strokeRect(marsDoorXPosition,marsDoorYPosition, 133, 200) // mars
-	ctx.strokeRect(cafeXPosition, cafeYPosition,263, 148) // cafe
-	ctx.strokeRect(deskXPosition, deskYPosition, 182, 54) // desk
-	ctx.strokeRect(lieutenantXPosition,lieutenantYPosition,PLAYERWIDTH,PLAYERHEIGHT)
+	if (stage == 5){
+		ctx.strokeRect(tvXPosition, tvYPosition, 225, 141) // tv
+		ctx.strokeRect(bedXPosition, bedYPosition, 210, 102) // bed
+		ctx.strokeRect(stairsXPosition, stairsYPosition, 156, 93) // stairs
+		ctx.strokeRect(doorXPosition, doorYPosition, 165, 27) // door	
+		ctx.strokeRect(deskXPosition, deskYPosition, 182, 54) // desk
+	} else if (stage == 4){		
+		ctx.strokeRect(marsDoorXPosition,marsDoorYPosition, 133, 200) // mars
+		ctx.strokeRect(cafeXPosition, cafeYPosition,263, 148) // cafe
+		ctx.strokeRect(lieutenantXPosition,lieutenantYPosition,PLAYERWIDTH,PLAYERHEIGHT)
+	}
+
+	
 }
 
+function yesOrNoF(){
+	if(yesOrNoOpen == true){ // if the yes or no bar is open
+		if (yesOrNo == 1){ // if its yes
+			ctx.drawImage(yesReady,0,0,WIDTH,HEIGHT) // draw yes
+		} else if (yesOrNo == 2){ // if its no
+			ctx.drawImage(noReady,0,0,WIDTH,HEIGHT) // draw no
+		}
+	} else { // if its no open
+		return; // do nothing
+	}
+}
 //#region tutorialthings
 function manageTutorial(){
 	if (stage == 1){
@@ -488,6 +520,43 @@ function moveBackground(){
 		//console.log("bg X: " + BGxPosition)
 		//console.log("bg Y: " + BGyPosition)
 	}
+	if (stage == 6){ // only works in the earth
+		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillRect(0,0,WIDTH,HEIGHT)
+		ctx.drawImage(earthBackground,BGxPosition, BGyPosition)
+		if (movingUp){
+			if (BGyPosition <= -5){ // if not touching the edge
+				BGyPosition = BGyPosition + moveSpeed // move the background
+			} else { // if it is
+				BGyPosition = BGyPosition // keep it the same
+			}
+		}
+		if(movingLeft){
+			if (BGxPosition <= -5){ // if not touching the edge
+				BGxPosition = BGxPosition + moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+		}
+		if(movingDown){
+			if (BGyPosition >= -2350){ // if not touching the edge
+				BGyPosition = BGyPosition - moveSpeed // move the background
+			} else { // if it is
+				BGyPosition = BGyPosition // keep it the same
+			}
+			
+		}
+		if(movingRight){
+			if (BGxPosition >= -2350){ // if not touching the edge
+				BGxPosition = BGxPosition - moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+			
+		}
+		//console.log("bg X: " + BGxPosition)
+		//console.log("bg Y: " + BGyPosition)
+	}
 }
 function updateHousePositions(){
 	bedXPosition = BGxPosition + 690
@@ -515,31 +584,76 @@ function houseThings(){
 	}
 }
 function toggleNoteF(){
-	if (stage == 5){
-		if (toggleNote == true){
-			if (diologueNumber == 2){
-				ctx.drawImage(note,0,0,WIDTH,HEIGHT)
+	if (stage == 5){ // only works in house
+		if (toggleNote == true){ // if note is open
+			if (diologueNumber == 2){ //if the dialogue number is 2
+				ctx.drawImage(note,0,0,WIDTH,HEIGHT) //draw the dialogue accociated with 2
+				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
-			} else if (diologueNumber == 0){
-				ctx.drawImage(dia0,0,0, WIDTH,HEIGHT)
-				console.log("Second floor")
+			} else if (diologueNumber == 0){ // if its 0
+				ctx.drawImage(dia0,0,0, WIDTH,HEIGHT) // draw dialogue 0
+				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
-			} else if (diologueNumber == 1){
-
-			} else if (diologueNumber == 3){
-				ctx.drawImage(dia3, 0,0,WIDTH,HEIGHT)
+			} else if (diologueNumber == 1){ // if its one
+				//draw dialogue one
+			} else if (diologueNumber == 3){ //if its three
+				ctx.drawImage(dia3, 0,0,WIDTH,HEIGHT) //draw three
+				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
 			}
 		}
-		else {
-			return;
-		}
+	} else if (stage == 4){ // only works on mars
+		if (toggleNote == true){ // if note is open
+			if (diologueNumber == 4){ // if its four
+				ctx.drawImage(dia4, 0,0,WIDTH,HEIGHT) //draw dialogue four
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if(diologueNumber == 5){ // if its five
+				ctx.drawImage(dia5,0,0,WIDTH,HEIGHT)
+				setTimeout(() => {checkZ();}, 2000)
+			}
+		}	
 	}
 }
+
 function checkZ(){
-	if (zPressed == true){
-		toggleNote = false
-		dialogueOpen = false
+	if (yesOrNoOpen == true){
+		if (zPressed == true){
+			if (yesOrNo == 1){
+				console.log("yes")
+				BGxPosition = -275
+				BGyPosition = -325
+				stage = 6
+				toggleNote = false
+				dialogueOpen = false
+				yesOrNoOpen = false
+			}
+			if (yesOrNo == 2){
+				console.log("no")
+				contiunedDialogue = 1
+				yesOrNoOpen = false
+				diologueNumber = 5
+				toggleNote = true
+				dialogueOpen = true
+			}
+		}
+	} else if (yesOrNoOpen == false){
+		if (zPressed){
+			if (contiunedDialogue == 0){
+				toggleNote = false
+				dialogueOpen = false
+			} else if (contiunedDialogue == 1){
+				var i = 1
+				if (zPressed){
+					i++
+				}
+				if (i <= 2){
+					toggleNote = false
+					dialogueOpen = false
+				}
+			}	
+		}	
 	}
 }
 function updateMarsPositions(){
@@ -577,10 +691,8 @@ function detectLieutenantCollision(){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= lieutenantXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= lieutenantYPosition && PLAYERXPOSITION <= lieutenantXPosition + PLAYERWIDTH && PLAYERYPOSITION <= lieutenantYPosition + PLAYERHEIGHT)
 		{
 			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
-			console.log("touching lieutenant")
 			return(true)
 		}else{
-			console.log("not touching lieutenant")
 			return(false)
 		}
 	}
@@ -671,7 +783,7 @@ function detectDoorCollision(){
 }
 //#endregion
 function chracterFacing(){
-	if (stage == 4 || stage == 5){
+	if (stage == 4 || stage == 5 || stage == 6 || stage == 7){
 		if (lastPressed == 1){
 			ctx.drawImage(astronautRight,PLAYERXPOSITION,PLAYERYPOSITION,PLAYERWIDTH,PLAYERHEIGHT)
 		} else if (lastPressed == 0){
@@ -808,19 +920,28 @@ function keyUpFunction(keyboardEvent){
 
 function inGameFunction(keyboardEvent){
 	var keyDown = keyboardEvent.key
+	if (yesOrNoOpen){
+		console.log("opened yes or no")
+		if (keyDown == 'ArrowUp'){
+			yesOrNo = 1
+			console.log("changed to yes")
+		}
+		if (keyDown == 'ArrowDown'){
+			yesOrNo = 2
+			console.log("changed to no")
+		}
+	}
 	if (stage == 4 || stage == 5 || stage == 6){ // this makes it only work in the game stage
 		if (!dialogueOpen){ 
 			if (keyDown == "ArrowUp"){ // press up key
-				if (!inventoryOpen){
+				if (inventoryOpen == false){
 					movingUp = true
 				}
-				//console.log("up pressed")
 			}
 			if (keyDown == "ArrowDown"){ // press down key
-				if(!inventoryOpen){
+				if(inventoryOpen == false){
 					movingDown = true
 				}
-				//console.log("down pressed")
 			}
 			if (keyDown == "ArrowLeft"){ // press left key
 				if (!inventoryOpen){
@@ -850,7 +971,7 @@ function inGameFunction(keyboardEvent){
 					}
 				}
 			}
-		} 
+		}
 		if (keyDown == 'z' || keyDown == 'Z'){
 			zPressed = true
 			if (inventoryOpen){ // if inventory is open
@@ -861,7 +982,7 @@ function inGameFunction(keyboardEvent){
 					console.log("go to items")
 					//open items menu
 				} else if (inventorySelection == 2) { // save game
-					if (stage == 5){
+					if (stage == 5 || stage == 4){
 						console.log("Its too early to save now")
 					} else if (stage == 6){
 						console.log("Saved Stage: Give code: 121231234")
@@ -913,6 +1034,15 @@ function inGameFunction(keyboardEvent){
 					if (detectCafeCollision()){
 						console.log("i give you good deal on coffe and biscuits")
 					}
+					if(detectLieutenantCollision()){		
+						yesOrNoOpen = true
+						toggleNote = true
+						dialogueOpen = true
+						diologueNumber = 4
+						contiunedDialogue = 0
+					}
+				} else if (stage == 6){ // if on train station
+
 				}
 			}
 			//console.log("z pressed")
@@ -963,7 +1093,7 @@ function keyDownFunction(keyboardEvent){
 					BGyPosition = 130
 					stage = 5
 				} else if (startingStage == 1){ // start from stage three earth
-					stage = 6
+					//stage = 6
 				} else if (startingStage == 2){ //start from stage two earth
 
 				} else if (startingStage == 3){ // start from right before boss battle
