@@ -611,6 +611,7 @@ function toggleNoteF(){
 			}
 			if(diologueNumber == 5){ // if its five
 				ctx.drawImage(dia5,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 1
 				setTimeout(() => {checkZ();}, 2000)
 			}
 		}	
@@ -643,15 +644,6 @@ function checkZ(){
 			if (contiunedDialogue == 0){
 				toggleNote = false
 				dialogueOpen = false
-			} else if (contiunedDialogue == 1){
-				var i = 1
-				if (zPressed){
-					i++
-				}
-				if (i <= 2){
-					toggleNote = false
-					dialogueOpen = false
-				}
 			}	
 		}	
 	}
