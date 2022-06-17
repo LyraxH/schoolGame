@@ -52,6 +52,12 @@ var yesOrNoOpen = false
 // 3 = cant go to sleep
 // 4 = want to go to earth
 // 5 = come back when youre ready (to go to earth)
+// 6 = saved too early
+// 8 = Noteboard 1
+// 9 = noteboard 2
+// 10 = noteboard 3
+// 11 = noteboard 4
+// 12 = noteboard 5
 //#endregion
 var contiunedDialogue = 0
 var dia0 = new Image()
@@ -62,6 +68,16 @@ var dia4 = new Image()
 dia4.src = 'dialogue/dia4.png'
 var dia5 = new Image()
 dia5.src = 'dialogue/dia5.png'
+var dia8 = new Image()
+dia8.src = 'dialogue/dia8.png'
+var dia9 = new Image()
+dia9.src = 'dialogue/dia9.png'
+var dia10 = new Image()
+dia10.src = 'dialogue/dia10.png'
+var dia11 = new Image()
+dia11.src = 'dialogue/dia11.png'
+var dia12 = new Image()
+dia12.src = 'dialogue/dia12.png'
 
 var yesReady = new Image()
 yesReady.src = 'dialogue/yesReady.png'
@@ -122,11 +138,15 @@ var marsHouseDoor = new Image()
 marsHouseDoor.src = 'mars/yourHosueDoor.png'
 var marsFoodCafe = new Image()
 marsFoodCafe.src = 'mars/buyFromCafe.png'
+var marsNoteBoard = new Image()
+marsNoteBoard.src = 'mars/noteboard.png'
 var lieutenant = new Image()
 lieutenant.src = 'characters/lieutenant.png'
 
 var marsDoorXPosition = 0 // width = 133
 var marsDoorYPosition = 0 // height = 200
+var boardXposition = 0 // width = 147
+var boardYPosition = 0 // height = 219
 var cafeXPosition = 0 // width = 263
 var cafeYPosition = 0 // height = 148
 var lieutenantXPosition = 0 // width = 92
@@ -281,11 +301,12 @@ function updateCanvas(){
 	detectMarsDoorCollision()
 	detectCafeCollision()
 	detectLieutenantCollision()
+	detectNoteBoardCollision()
 	updateMarsPositions()
 	manageInventory()
 
-	console.log(stage) //this is my testing console.log
-	console.log(atkBuff)
+	console.log() //this is my testing console.log
+	//console.log(atkBuff)
 	chracterFacing()
 	yesOrNoF()
 	toggleNoteF()
@@ -300,7 +321,8 @@ function updateCanvas(){
 	} else if (stage == 4){		
 		ctx.strokeRect(marsDoorXPosition,marsDoorYPosition, 133, 200) // mars
 		ctx.strokeRect(cafeXPosition, cafeYPosition,263, 148) // cafe
-		ctx.strokeRect(lieutenantXPosition,lieutenantYPosition,PLAYERWIDTH,PLAYERHEIGHT)
+		ctx.strokeRect(lieutenantXPosition,lieutenantYPosition,PLAYERWIDTH,PLAYERHEIGHT) // other player on mars
+		ctx.strokeRect(boardXposition, boardYPosition,147, 219) // noteboard
 	}
 
 	
@@ -637,13 +659,39 @@ function toggleNoteF(){
 				contiunedDialogue = 1
 				setTimeout(() => {checkZ();}, 2000)
 			}
-			if(diologueNumber == 6){
+			if(diologueNumber == 6){ // if 6
 				ctx.drawImage(SavedTooEarly,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
 			}
+			if(diologueNumber == 8){ // noteboard 1
+				ctx.drawImage(dia8,0,0,WIDTH,HEIGHT)
+				yesOrNoOpen = false
+				contiunedDialogue = 5
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if(diologueNumber == 9){ // noteboard 2
+				ctx.drawImage(dia9,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 5
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if(diologueNumber == 10){ // noteboard 3
+				ctx.drawImage(dia10,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 5
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if(diologueNumber == 11){ // noteboard 4
+				ctx.drawImage(dia11,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 5
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if(diologueNumber == 12){ // noteboard 5
+				ctx.drawImage(dia12,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
 		}	
-	} else if (stage ==6){//only works on earth stage one
+	} else if (stage == 6){//only works on earth stage one
 		if (toggleNote == true){
 			if (diologueNumber == 7){
 				ctx.drawImage(SavedEarthOne,0,0,WIDTH,HEIGHT)
@@ -653,7 +701,6 @@ function toggleNoteF(){
 		}
 	}
 }
-
 function checkZ(){
 	if (yesOrNoOpen == true){
 		if (zPressed == true){
@@ -670,7 +717,7 @@ function checkZ(){
 				console.log("no")
 				contiunedDialogue = 1
 				yesOrNoOpen = false
-				diologueNumber = 5
+				diologueNumber = 2
 				toggleNote = true
 				dialogueOpen = true
 			}
@@ -681,8 +728,31 @@ function checkZ(){
 				toggleNote = false
 				dialogueOpen = false
 			}	
+			if (contiunedDialogue == 5){
+				var i = 0
+				if (i < 5){
+					if (zPressed == true){
+						i++
+					}
+					if (i == 0){
+						diologueNumber == 8
+					}
+					if (i == 1){
+						diologueNumber == 9
+					}
+					if (i == 2){
+						diologueNumber == 10
+					}
+					if (i == 3){
+						diologueNumber == 11
+					}
+					if (i == 4){
+						diologueNumber == 12
+					}
+				}
+			}
 		}	
-	}	
+	}
 }
 function updateMarsPositions(){
 	marsDoorXPosition = BGxPosition +  2410
@@ -691,12 +761,15 @@ function updateMarsPositions(){
 	cafeYPosition = BGyPosition + 1633
 	lieutenantXPosition = BGxPosition + 2200
 	lieutenantYPosition = BGyPosition + 2500
+	boardXposition = BGxPosition + 390
+	boardYPosition = BGyPosition + 1572
 }
 function marsThings(){
 	if (stage == 4){
 		ctx.drawImage(marsHouseDoor, marsDoorXPosition, marsDoorYPosition)
 		ctx.drawImage(marsFoodCafe, cafeXPosition, cafeYPosition)
 		ctx.drawImage(lieutenant, lieutenantXPosition, lieutenantYPosition, PLAYERWIDTH, PLAYERHEIGHT)
+		ctx.drawImage(marsNoteBoard, boardXposition, boardYPosition)
 	}
 }
 
@@ -704,6 +777,19 @@ function marsThings(){
 function detectMarsDoorCollision(){
 	if (stage == 4){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= marsDoorXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= marsDoorYPosition && PLAYERXPOSITION <= marsDoorXPosition + 133 && PLAYERYPOSITION <= marsDoorYPosition + 200)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			//console.log("touching mars door")
+			return(true)
+		}else{
+			//console.log("not touching mars door")
+			return(false)
+		}
+	}
+}
+function detectNoteBoardCollision(){
+	if (stage == 4){
+		if(PLAYERXPOSITION + PLAYERWIDTH > boardXposition && PLAYERYPOSITION + PLAYERHEIGHT >= boardYPosition && PLAYERXPOSITION <= boardXposition + 147 && PLAYERYPOSITION <= boardYPosition + 219)
 		{
 			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
 			//console.log("touching mars door")
@@ -883,7 +969,7 @@ function submitCode(){
 	} else if (stage == 1){
 		var warningText = document.getElementById("warningText")
 		var errorCode = document.getElementById("errorCode")
-		errorCode.innerHTML = "Error Code: 186010"
+		errorCode.innerHTML = "Error Code: 129031"
 		warningText.innerHTML = "Code cannot be entered in tutorial <br> Press x to close this notice"
 	} else if (stage == 2){ // if they are trying to access this button by using another tab ingame
 		var warningText = document.getElementById("warningText")
@@ -893,7 +979,7 @@ function submitCode(){
 	} else if (stage == 0){ // if they are trying to access this button by using another tab ingame
 		var warningText = document.getElementById("warningText")
 		var errorCode = document.getElementById("errorCode")
-		errorCode.innerHTML = "Error Code: 164384"
+		errorCode.innerHTML = "Error Code: 154384"
 		warningText.innerHTML = "Code cannot be entered in the Main Menu <br> Press x to close this notice"
 	}
 }
@@ -1066,6 +1152,13 @@ function inGameFunction(keyboardEvent){
 						stage = 5
 						BGxPosition = -130
 						BGyPosition = -340
+					}
+					if (detectNoteBoardCollision()){
+						console.log("read notes")
+						diologueNumber = 8
+						contiunedDialogue = 5
+						toggleNote = true
+						dialogueOpen = true
 					}
 					if (detectCafeCollision()){
 						console.log("i give you good deal on coffe and biscuits")
