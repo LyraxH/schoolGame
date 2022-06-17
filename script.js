@@ -34,14 +34,16 @@ var lastPressed = 0 // 0 = left 1 = right
 var zPressed = false
 
 // game variables
+var atkBuff = false // if the character has the attack buff teammate
+var defBuff = false // if the character has the defense buff teammate
 var moveSpeed = 5 // how fast the play moves...
 var inventoryOpen = false // is the inventory open
 var inventorySelection = 0 // what is selected in the inventory
 var tvToggle = 0 // 0 = off 1 = on
 var dialogueOpen = false
 var toggleNote = false
-var diologueNumber = 0
-var yesOrNo = 1
+var diologueNumber = 0 // what number to set diologue for
+var yesOrNo = 1 // this is a nightmare
 var yesOrNoOpen = false
 //#region diologue Numbers
 // 0 = cant go upstairs in house
@@ -68,6 +70,23 @@ noReady.src = 'dialogue/noReady.png'
 var BGxPosition = 0
 var BGyPosition = 0
 var startingStage = 0
+
+//#region save screens
+var SavedTooEarly = new Image() // when you try to save in mars
+SavedTooEarly.src = 'inventory/GameSavedTooEarly.png'
+var SavedEarthOne = new Image() // when you save on earth stage one without getting a teammate
+SavedEarthOne.src = 'inventory/GameSaved186010.png'
+var SavedEarthOneATK = new Image() // when you save on earth stage one with the attack buff teammate
+SavedEarthOneATK.src = 'inventory/GameSaved186635.png'
+var SavedEarthTwo = new Image() // when you save on earth stage two without any teammates
+SavedEarthTwo.src = 'inventory/GameSaved185656.png'
+var SavedEarthTwoATK = new Image() // saving earth stage two with the attack buff teammate
+SavedEarthTwoATK.src = 'inventory/GameSaved188309.png'
+var SavedEarthTwoDEF = new Image() // saving earth stage two with just the defense buff teammate
+SavedEarthTwoDEF.src = 'inventory/GameSaved188433.png'
+var SavedEarthTwoATKDEF = new Image() // saving earth stage two with both teammates
+SavedEarthTwoATKDEF.src = 'inventory/GameSaved182956.png'
+//#endregion
 
 // variables for the house in the game
 var houseBackground = new Image()
@@ -265,8 +284,8 @@ function updateCanvas(){
 	updateMarsPositions()
 	manageInventory()
 
-	//console.log(zPressed) //this is my testing console.log
-	console.log(yesOrNo)
+	console.log(stage) //this is my testing console.log
+	console.log(atkBuff)
 	chracterFacing()
 	yesOrNoF()
 	toggleNoteF()
@@ -600,6 +619,10 @@ function toggleNoteF(){
 				ctx.drawImage(dia3, 0,0,WIDTH,HEIGHT) //draw three
 				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
+			} else if (diologueNumber == 6){
+				ctx.drawImage(SavedTooEarly,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
 			}
 		}
 	} else if (stage == 4){ // only works on mars
@@ -614,7 +637,20 @@ function toggleNoteF(){
 				contiunedDialogue = 1
 				setTimeout(() => {checkZ();}, 2000)
 			}
+			if(diologueNumber == 6){
+				ctx.drawImage(SavedTooEarly,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
 		}	
+	} else if (stage ==6){//only works on earth stage one
+		if (toggleNote == true){
+			if (diologueNumber == 7){
+				ctx.drawImage(SavedEarthOne,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+		}
 	}
 }
 
@@ -646,7 +682,7 @@ function checkZ(){
 				dialogueOpen = false
 			}	
 		}	
-	}
+	}	
 }
 function updateMarsPositions(){
 	marsDoorXPosition = BGxPosition +  2410
@@ -797,8 +833,9 @@ function submitCode(){
 			errorCode.innerHTML = "Error Code: 131202"
 			warningText.innerHTML = "Please enter a code <br> Press x to close this notice"
 		} else { // if there is a code it checks it with the following list
-			if(codeInput == "121231234"){ // will send you to the first stage on earth
+			if(codeInput == "186010"){ // will send you to the first stage on earth no teammates
 				startingStage = 1
+				atkBuff = false
 				console.log("good code")
 				goodCode = true
 				var warningText = document.getElementById("warningText")
@@ -807,8 +844,9 @@ function submitCode(){
 				errorCode.innerHTML = ""
 				BGxPosition = 69 //change this
 				BGyPosition = 420 // and this
-			} else if (codeInput == "othercode"){ // sends you to second stage on earth
+			} else if (codeInput == "186635"){ // sends you to first stage on earth attack buff teammate
 				startingStage = 2
+				atkBuff = true
 				console.log("good code")
 				goodCode = true
 				var warningText = document.getElementById("warningText")
@@ -976,8 +1014,14 @@ function inGameFunction(keyboardEvent){
 				} else if (inventorySelection == 2) { // save game
 					if (stage == 5 || stage == 4){
 						console.log("Its too early to save now")
+						diologueNumber = 6
+						toggleNote = true
+						dialogueOpen = true
 					} else if (stage == 6){
-						console.log("Saved Stage: Give code: 121231234")
+						console.log("Saved Stage: Give code: 186010")
+						diologueNumber = 7
+						toggleNote = true
+						dialogueOpen = true
 					} else if (stage == 7){
 						console.log("Saved Stage: Give code: othercode")
 					} else if (stage == 8){
@@ -1079,16 +1123,32 @@ function keyDownFunction(keyboardEvent){
 			}
 		}	
 		if (keyDown == 'z' || keyDown == 'Z'){ // pressing z will send you to different screens depending on where the selector is.
-			if(playerSelection == 0){
+			if(playerSelection == 0){ // play game
 				if (startingStage == 0){
 					BGxPosition = -500
 					BGyPosition = 130
 					stage = 5
-				} else if (startingStage == 1){ // start from stage three earth
-					//stage = 6
-				} else if (startingStage == 2){ //start from stage two earth
+				} else if (startingStage == 1){ // start from stage one earth no teammates
+					BGxPosition = -275
+					BGyPosition = -325
+					stage = 6
+				} else if (startingStage == 2){ //start from stage one earth attack buff teammate
 
-				} else if (startingStage == 3){ // start from right before boss battle
+				} else if (startingStage == 3){ // start from stage two earth no teammates
+
+				} else if (startingStage == 4){ // start from stage two earth attack buff teammate
+
+				} else if (startingStage == 5){ // start from stage two earth defence buff teammate
+
+				} else if (startingStage == 6){ // start from stage two earth both teammates
+					
+				} else if (startingStage == 7){ // start from right before boss battle no teammates
+
+				} else if (startingStage == 8){ // start from right before boss battle attack buff teammate
+
+				} else if (startingStage == 9){ // start from right before boss battle defence buff teammate
+
+				} else if (startingStage == 10){ // start from right before boss battle both teammates
 
 				}
 			} else if (playerSelection == 1){ // go to tutorial
