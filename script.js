@@ -152,6 +152,11 @@ var cafeYPosition = 0 // height = 148
 var lieutenantXPosition = 0 // width = 92
 var lieutenantYPosition = 0 // height = 127
 
+//variables used for earth in game
+var tentEnterance = new Image()
+tentEnterance.src = ''
+var trainEnterance = new Image()
+
 //tutorial variables
 var tutorialScreen = 0
 
@@ -323,6 +328,8 @@ function updateCanvas(){
 		ctx.strokeRect(cafeXPosition, cafeYPosition,263, 148) // cafe
 		ctx.strokeRect(lieutenantXPosition,lieutenantYPosition,PLAYERWIDTH,PLAYERHEIGHT) // other player on mars
 		ctx.strokeRect(boardXposition, boardYPosition,147, 219) // noteboard
+	} else if (stage == 6){
+
 	}
 
 	
@@ -667,18 +674,19 @@ function toggleNoteF(){
 			if(diologueNumber == 8){ // noteboard 1
 				ctx.drawImage(dia8,0,0,WIDTH,HEIGHT)
 				yesOrNoOpen = false
-				contiunedDialogue = 5
+				contiunedDialogue = 2
 				setTimeout(() => {checkZ();}, 250)
 			}
 			if(diologueNumber == 9){ // noteboard 2
 				ctx.drawImage(dia9,0,0,WIDTH,HEIGHT)
-				contiunedDialogue = 5
+				contiunedDialogue = 3
 				setTimeout(() => {checkZ();}, 250)
 			}
 			if(diologueNumber == 10){ // noteboard 3
 				ctx.drawImage(dia10,0,0,WIDTH,HEIGHT)
-				contiunedDialogue = 5
+				contiunedDialogue = 4
 				setTimeout(() => {checkZ();}, 250)
+
 			}
 			if(diologueNumber == 11){ // noteboard 4
 				ctx.drawImage(dia11,0,0,WIDTH,HEIGHT)
@@ -687,7 +695,7 @@ function toggleNoteF(){
 			}
 			if(diologueNumber == 12){ // noteboard 5
 				ctx.drawImage(dia12,0,0,WIDTH,HEIGHT)
-				contiunedDialogue = 0
+				contiunedDialogue = 6
 				setTimeout(() => {checkZ();}, 250)
 			}
 		}	
@@ -715,11 +723,12 @@ function checkZ(){
 			}
 			if (yesOrNo == 2){
 				console.log("no")
-				contiunedDialogue = 1
 				yesOrNoOpen = false
-				diologueNumber = 2
+				diologueNumber = 5
 				toggleNote = true
 				dialogueOpen = true
+				contiunedDialogue = 0
+				return;
 			}
 		}
 	} else if (yesOrNoOpen == false){
@@ -727,32 +736,39 @@ function checkZ(){
 			if (contiunedDialogue == 0){
 				toggleNote = false
 				dialogueOpen = false
+				return;
 			}	
-			if (contiunedDialogue == 5){
-				var i = 0
-				if (i < 5){
-					if (zPressed == true){
-						i++
-					}
-					if (i == 0){
-						diologueNumber == 8
-					}
-					if (i == 1){
-						diologueNumber == 9
-					}
-					if (i == 2){
-						diologueNumber == 10
-					}
-					if (i == 3){
-						diologueNumber == 11
-					}
-					if (i == 4){
-						diologueNumber == 12
-					}
-				}
+			if (contiunedDialogue == 2){
+				toggleNote = false
+				dialogueOpen = false
+				diologueNumber = 9
+				setTimeout(() => {setTrue();}, 250)
+				return;
+			} else if (contiunedDialogue == 3){
+				toggleNote = false
+				dialogueOpen = false
+				diologueNumber = 10
+				return;
+			} else if (contiunedDialogue == 4){
+				toggleNote = false
+				dialogueOpen = false
+				diologueNumber = 11
+				return;
+			} else if (contiunedDialogue == 5){
+				toggleNote = false
+				dialogueOpen = false
+				diologueNumber = 12
+				return;
+			} else if (contiunedDialogue == 6){
+				toggleNote = false
+				dialogueOpen = false
 			}
-		}	
+		}
 	}
+}
+function setTrue(){
+	toggleNote = true
+	dialogueOpen = true
 }
 function updateMarsPositions(){
 	marsDoorXPosition = BGxPosition +  2410
