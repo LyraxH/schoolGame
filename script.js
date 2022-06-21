@@ -11,6 +11,7 @@ const PLAYERWIDTH = 51
 const PLAYERHEIGHT = 74
 const PLAYERXPOSITION = 280
 const PLAYERYPOSITION = 180
+const BACKGROUNDCOLOR = 'rgb(12,12,12)'
 var WIDTH = 640
 var HEIGHT = 480
 var isFullScreen = false
@@ -66,6 +67,9 @@ var yesOrNoOpen = false
 // 16 = team3
 // 18 = bullitin board notice thing
 // 19 = drawers are locked
+// 20 = zombies are aids, please help us.
+// 21 = you have recieved the atk buff
+// 23 = no one is working the food stand right now
 //#endregion
 var contiunedDialogue = 0
 var dia0 = new Image()
@@ -90,6 +94,12 @@ var dia18 = new Image()
 dia18.src = 'dialogue/dia18.png'
 var dia19 = new Image()
 dia19.src = 'dialogue/dia19.png'
+var dia20 = new Image()
+dia20.src = 'dialogue/dia20.png'
+var dia21 = new Image()
+dia21.src = 'dialogue/dia21.png'
+var dia23 = new Image()
+dia23.src = 'dialogue/dia23.png'
 
 var yesReady = new Image()
 yesReady.src = 'dialogue/yesReady.png'
@@ -114,8 +124,10 @@ var SavedEarthTwoDEF = new Image() // saving earth stage two with just the defen
 SavedEarthTwoDEF.src = 'inventory/GameSaved188433.png'
 var SavedEarthTwoATKDEF = new Image() // saving earth stage two with both teammates
 SavedEarthTwoATKDEF.src = 'inventory/GameSaved182956.png'
-var SavedTent = new Image() // saving the game in the tent, will reset atk stats.
+var SavedTent = new Image() // saving the game in the tent, no attack buff
 SavedTent.src = 'inventory/GameSaved188565.png'
+var savedTentATK = new Image() // saving the game in the tent, attack buff present
+savedTentATK.src = 'inventory/GameSaved188239.png'
 //#endregion
 //#region teammates
 var team0 = new Image() // just you
@@ -167,6 +179,7 @@ marsNoteBoard.src = 'mars/noteboard.png'
 var lieutenant = new Image()
 lieutenant.src = 'characters/lieutenant.png'
 
+var noteboardOpen = false
 var marsDoorXPosition = 0 // width = 133
 var marsDoorYPosition = 0 // height = 200
 var boardXposition = 0 // width = 147
@@ -201,6 +214,8 @@ var bullitinxPosition = 0 // width = 145
 var bullitinyPosition = 0 // height = 98
 var drawersxPosition = 0 // wdith = 168
 var drawersyPosition = 0 // height = 111
+var atkBuffXPosition = 0 // width = 55
+var atkBuffYPosition = 0 // height = 90
 
 //tutorial variables
 var tutorialScreen = 0
@@ -290,6 +305,10 @@ var astronautLeft = new Image()
 astronautLeft.src = 'characters/astronautLeft.png'
 var astronautRight = new Image()
 astronautRight.src = 'characters/astronautRight.png'
+var atkBuffC = new Image()
+atkBuffC.src = 'characters/atkBuff.png'
+var defBuffC = new Image()
+defBuffC.src = 'characters/defBuff.png'
 var zombieIdle = new Image()
 zombieIdle.src = 'zombies/zombie_idle.png'
 var zombieFlex = new Image()
@@ -333,7 +352,7 @@ function startCanvas(){
 }
 function updateCanvas(){
 	// reset the canvas
-	ctx.fillStyle="white"
+	ctx.fillStyle = ' white'
 	ctx.fillRect(0,0,WIDTH, HEIGHT)
 	
 	checkStage()
@@ -364,11 +383,14 @@ function updateCanvas(){
 	detectExitCollision()
 	detectbullitinCollision()
 	detectDrawerCollision()
+	detectATKBuffCollision()
 
 	//console.log("stage " + stage) //this is my testing console.log
-	console.log("bgx " + BGxPosition)
-	console.log("bgy " + BGyPosition)
+	//console.log("bgx " + BGxPosition)
+	//console.log("bgy " + BGyPosition)
 	//console.log("tent "+ tentYPosition)
+	console.log("atk buff " + atkBuff)
+	//console.log("def buff " + defBuff)
 	chracterFacing()
 	yesOrNoF()
 	toggleNoteF()
@@ -392,6 +414,7 @@ function updateCanvas(){
 		ctx.strokeRect(exitxPosition, exityPosition, 18, 369) // exit
 		ctx.strokeRect(bullitinxPosition, bullitinyPosition, 145, 98) // bullitin
 		ctx.strokeRect(drawersxPosition, drawersyPosition, 168, 111)//drwaers
+		ctx.strokeRect(atkBuffXPosition, atkBuffYPosition, 55, 90) // atk buff character
 	}
 }
 
@@ -513,7 +536,7 @@ function mainMenuText(){ // depending on what the player cursor is hovering it w
 
 function checkStage(){
 	if (stage == 0){ // main menu and main menu backgrounds
-		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillStyle = BACKGROUNDCOLOR
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
 		ctx.drawImage(backgroundMenu,150,-80,WIDTH,HEIGHT)
 	} else if (stage == 1){ // tutorial backgrounds
@@ -557,7 +580,7 @@ function manageMovement(){
  }
 function moveBackground(){
 	if (stage == 5){ // only works in the house
-		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillStyle = BACKGROUNDCOLOR
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
 		ctx.drawImage(houseBackground,BGxPosition, BGyPosition)
 		if (movingUp){
@@ -592,7 +615,7 @@ function moveBackground(){
 		}
 	}
 	if (stage == 4){ // only works in the mars phase of the game
-		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillStyle = BACKGROUNDCOLOR
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
 		ctx.drawImage(marsBackground,BGxPosition, BGyPosition)
 		if (movingUp){
@@ -629,7 +652,7 @@ function moveBackground(){
 		//console.log("bg Y: " + BGyPosition)
 	}
 	if (stage == 6){ // only works in the earth
-		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillStyle = BACKGROUNDCOLOR
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
 		ctx.drawImage(earthBackground,BGxPosition, BGyPosition)
 		if (movingUp){
@@ -666,7 +689,7 @@ function moveBackground(){
 		//console.log("bg Y: " + BGyPosition)
 	}
 	if (stage == 7){ // only works in the tent
-		ctx.fillStyle = 'rgb(12,12,12)'
+		ctx.fillStyle = BACKGROUNDCOLOR
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
 		ctx.drawImage(tentBackground,BGxPosition, BGyPosition)
 		if(movingLeft){
@@ -778,6 +801,11 @@ function toggleNoteF(){
 				contiunedDialogue = 6
 				setTimeout(() => {checkZ();}, 250)
 			}
+			if (diologueNumber == 23){
+				ctx.drawImage(dia23,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
 			if (toggleNote == true){
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
@@ -850,7 +878,22 @@ function toggleNoteF(){
 				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
 			}
-			if (toggleNote == true){
+			if (diologueNumber == 20){
+				ctx.drawImage(dia20,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 12
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 21){
+				ctx.drawImage(dia21,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 22){
+				ctx.drawImage(savedTentATK, 0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (toggleNote == true){ // i do toggle note again just so i know where the team cut off is
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
@@ -903,35 +946,55 @@ function checkZ(){
 			if (contiunedDialogue == 0){
 				toggleNote = false
 				dialogueOpen = false
-				return;
 			}	
 			if (contiunedDialogue == 2){
-				toggleNote = false
-				dialogueOpen = false
-				diologueNumber = 9
-				setTimeout(() => {setTrue();}, 250)
-				return;
+				setTimeout(() => {oneToTwo();}, 250)
 			} else if (contiunedDialogue == 3){
-				toggleNote = false
-				dialogueOpen = false
-				diologueNumber = 10
-				return;
+				setTimeout(() => {twoToThree();}, 250)
 			} else if (contiunedDialogue == 4){
-				toggleNote = false
-				dialogueOpen = false
-				diologueNumber = 11
-				return;
+				setTimeout(() => {threeToFour();}, 250)
 			} else if (contiunedDialogue == 5){
-				toggleNote = false
-				dialogueOpen = false
-				diologueNumber = 12
-				return;
+				setTimeout(() => {fourToFive();}, 250)
 			} else if (contiunedDialogue == 6){
 				toggleNote = false
 				dialogueOpen = false
+				noteboardOpen = false
+			} else if (contiunedDialogue == 12){
+				setTimeout(() => {addATKBuff();}, 250)
 			}
 		}
 	}
+}
+function oneToTwo(){ // two to the one
+	diologueNumber = 9
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 3
+}
+function twoToThree(){ // to the one
+	diologueNumber = 10
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 4
+}
+function threeToFour(){ // to the three
+	diologueNumber = 11
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 5
+}
+function fourToFive(){
+	diologueNumber = 12
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 6
+}
+
+function addATKBuff(){
+	diologueNumber = 21
+	toggleNote = true
+	dialogueOpen = true
+	atkBuff = true
 }
 function setTrue(){
 	toggleNote = true
@@ -999,12 +1062,15 @@ function updateTentPositions(){
 	bullitinyPosition = BGyPosition + 215
 	drawersxPosition = BGxPosition + 680
 	drawersyPosition = BGyPosition + 215
+	atkBuffXPosition = BGxPosition + 1565
+	atkBuffYPosition = BGyPosition + 280
 }
 function tentThings(){
 	if (stage == 7){
 		ctx.drawImage(tentExit,tentXPosition,tentYPosition)
 		ctx.drawImage(bullitin, bullitinxPosition, bullitinyPosition)
 		ctx.drawImage(drawers, drawersxPosition, drawersyPosition)
+		ctx.drawImage(atkBuffC, atkBuffXPosition, atkBuffYPosition)
 	}
 }
 //#region earth object collisions
@@ -1051,7 +1117,20 @@ function detectbullitinCollision(){
 }
 function detectDrawerCollision(){
 	if (stage == 7){
-		if(PLAYERXPOSITION + PLAYERWIDTH >= drawersxPosition && PLAYERYPOSITION + PLAYERHEIGHT >= drawersyPosition && PLAYERXPOSITION <= drawersxPosition + 168 && PLAYERYPOSITION <= drawersxPosition + 111)
+		if(PLAYERXPOSITION + PLAYERWIDTH >= drawersxPosition && PLAYERYPOSITION + PLAYERHEIGHT >= drawersyPosition && PLAYERXPOSITION <= drawersxPosition + 168 && PLAYERYPOSITION <= drawersyPosition + 111)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			//console.log("touching tent enterance")
+			return(true)
+		}else{
+			//console.log("not touching tent enterance")
+			return(false)
+		}
+	}
+}
+function detectATKBuffCollision(){
+	if (stage == 7){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= atkBuffXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= atkBuffYPosition && PLAYERXPOSITION <= atkBuffXPosition + 55 && PLAYERYPOSITION <= atkBuffYPosition + 90)
 		{
 			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
 			//console.log("touching tent enterance")
@@ -1195,12 +1274,12 @@ function chracterFacing(){
 		}
 	}
 }
+
+//#region codes
 function updateCode(){ // this just takes the input field in the html and puts it into a variable
 	codeInput = document.getElementById("enterCode").value
 	//console.log(codeInput)
 }
-
-//#region codes
 function submitCode(){
 	if (stage == 3){
 		if (codeInput == null || codeInput == ""){ // checks there is acutally a code written in and if there isnt it will give error
@@ -1241,6 +1320,15 @@ function submitCode(){
 				errorCode.innerHTML = ""
 				BGxPosition = 420 // and this
 				BGyPosition = 69 // and this
+			} else if (codeInput == "188239"){
+				startingStage = 7
+				atkBuff = true
+				console.log("good code")
+				goodCode = true
+				var warningText = document.getElementById("warningText")
+				var errorCode = document.getElementById("errorCode")
+				warningText.innerHTML = ""
+				errorCode.innerHTML = ""
 			} else if (codeInput == "asdasd"){ // sends you to right before final boss battle
 				startingStage = 3
 				console.log("good code")
@@ -1418,23 +1506,30 @@ function inGameFunction(keyboardEvent){
 					console.log("go to items")
 					//open items menu
 				} else if (inventorySelection == 2) { // save game
-					if (stage == 5 || stage == 4){
+					if (stage == 5 || stage == 4){ // house and mars
 						console.log("Its too early to save now")
 						diologueNumber = 6
 						toggleNote = true
 						dialogueOpen = true
-					} else if (stage == 6){
+					} else if (stage == 6){ // earth stage 1
 						console.log("Saved Stage: Give code: 186010")
 						diologueNumber = 7
 						toggleNote = true
 						dialogueOpen = true
-					} else if (stage == 7){
-						console.log("Saved Stage: Give code: 188565")
-						diologueNumber = 17
-						toggleNote = true
-						dialogueOpen = true
-					} else if (stage == 8){
-						console.log("Saved Stage: Give code: asdasd")
+					} else if (stage == 7){ // inside the tent
+						if (atkBuff == false){
+							console.log("Saved Stage: Give code: 188565")
+							diologueNumber = 17
+							toggleNote = true
+							dialogueOpen = true
+						} else if (atkBuff == true){
+							console.log("Saved Stage: Give code: 188239")
+							diologueNumber = 22
+							toggleNote = true
+							dialogueOpen = true
+						}
+					} else if (stage == 8){ // in train station
+						
 					}
 				}
 			} else if (!inventoryOpen) { // if inventory is closed
@@ -1476,15 +1571,10 @@ function inGameFunction(keyboardEvent){
 						BGxPosition = -130
 						BGyPosition = -340
 					}
-					if (detectNoteBoardCollision()){
-						console.log("read notes")
-						diologueNumber = 8
-						contiunedDialogue = 5
+					if (detectCafeCollision()){
+						diologueNumber = 23
 						toggleNote = true
 						dialogueOpen = true
-					}
-					if (detectCafeCollision()){
-						console.log("i give you good deal on coffe and biscuits")
 					}
 					if(detectLieutenantCollision()){		
 						yesOrNoOpen = true
@@ -1493,13 +1583,24 @@ function inGameFunction(keyboardEvent){
 						diologueNumber = 4
 						contiunedDialogue = 0
 					}
+					if (noteboardOpen == false){
+						if (detectNoteBoardCollision()){
+							console.log("read notes")
+							diologueNumber = 8
+							contiunedDialogue = 5
+							toggleNote = true
+							dialogueOpen = true
+							noteboardOpen = true
+						}
+					}
 				} else if (stage == 6){ // if on earth
 					if (detectTentCollision()){
 						console.log("go to tent")
 						stage = 7
-						BGxPosition = -10
-						BGyPosition = -125
-					}
+						lastPressed = 1
+						BGxPosition = 250
+						BGyPosition = -120
+					}				
 				} else if (stage == 7){ // if in the tent
 					if (detectExitCollision()){
 						console.log("go to earth")
@@ -1516,6 +1617,18 @@ function inGameFunction(keyboardEvent){
 						diologueNumber = 19
 						toggleNote = true
 						dialogueOpen = true
+					}
+					if (detectATKBuffCollision()){
+						if (atkBuff == false){ // if you dont already own attack buff
+							diologueNumber = 20 // get attack buff
+							toggleNote = true
+							dialogueOpen = true
+						} else if (atkBuff == true){ // if you do however own the attack buff
+							diologueNumber == 24 // she will point you in the direction of the trainstation
+							toggleNote = true
+							dialogueOpen = true
+						}
+				
 					}
 				}
 			}
