@@ -37,12 +37,16 @@ var zPressed = false
 // game variables
 var atkBuff = false // if the character has the attack buff teammate
 var defBuff = false // if the character has the defense buff teammate
+var attackDamage = 5
+var health = 10
 var moveSpeed = 5 // how fast the play moves...
 var inventoryOpen = false // is the inventory open
 var inventorySelection = 0 // what is selected in the inventory
+var battleSelection = 0 // waht is selected during battle
 var tvToggle = 0 // 0 = off 1 = on
 var dialogueOpen = false
 var toggleNote = false
+var inBattle = false
 var diologueNumber = 0 // what number to set diologue for
 var yesOrNo = 1 // this is a nightmare
 var yesOrNoOpen = false
@@ -70,6 +74,7 @@ var yesOrNoOpen = false
 // 20 = zombies are aids, please help us.
 // 21 = you have recieved the atk buff
 // 23 = no one is working the food stand right now
+// 24 = point in the direction of the train station
 //#endregion
 var contiunedDialogue = 0
 var dia0 = new Image()
@@ -100,6 +105,8 @@ var dia21 = new Image()
 dia21.src = 'dialogue/dia21.png'
 var dia23 = new Image()
 dia23.src = 'dialogue/dia23.png'
+var dia24 = new Image()
+dia24.src = 'dialogue/dia24.png'
 
 var yesReady = new Image()
 yesReady.src = 'dialogue/yesReady.png'
@@ -239,6 +246,13 @@ var inventoryItems = new Image()
 inventoryItems.src = 'inventory/inventoryItemsSelected.png'
 var inventorySave = new Image()
 inventorySave.src = 'inventory/inventorySaveSelected.png'
+// images for the battle
+var attackSelected = new Image()
+attackSelected.src = 'inventory/AttackSelected.png'
+var blockSelected = new Image()
+blockSelected.src = 'inventory/BlockSelected.png'
+var runSelected = new Image()
+runSelected.src = 'inventory/RunSelected.png'
 
 // extra images
 var interactButton = new Image()
@@ -384,12 +398,14 @@ function updateCanvas(){
 	detectbullitinCollision()
 	detectDrawerCollision()
 	detectATKBuffCollision()
+	updateStats()
 
 	//console.log("stage " + stage) //this is my testing console.log
 	//console.log("bgx " + BGxPosition)
 	//console.log("bgy " + BGyPosition)
 	//console.log("tent "+ tentYPosition)
-	console.log("atk buff " + atkBuff)
+	console.log("atkdmg " + attackDamage)
+	console.log("hp " + health)
 	//console.log("def buff " + defBuff)
 	chracterFacing()
 	yesOrNoF()
@@ -415,6 +431,18 @@ function updateCanvas(){
 		ctx.strokeRect(bullitinxPosition, bullitinyPosition, 145, 98) // bullitin
 		ctx.strokeRect(drawersxPosition, drawersyPosition, 168, 111)//drwaers
 		ctx.strokeRect(atkBuffXPosition, atkBuffYPosition, 55, 90) // atk buff character
+	}
+}
+function updateStats(){
+	if (atkBuff == true){
+		attackDamage = 7
+	} else if (atkBuff == false){
+		attackDamage = 4
+	}
+	if (defBuff == true){
+		health = 25
+	} else if (defBuff == false){
+		health = 15
 	}
 }
 
@@ -893,6 +921,11 @@ function toggleNoteF(){
 				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
 			}
+			if (diologueNumber == 24){
+				ctx.drawImage(dia24, 0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
 			if (toggleNote == true){ // i do toggle note again just so i know where the team cut off is
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
@@ -919,22 +952,22 @@ function toggleNoteF(){
 		}
 	}
 }
-function checkZ(){
-	if (yesOrNoOpen == true){
-		if (zPressed == true){
-			if (yesOrNo == 1){
+function checkZ(){ // check if z is pressed
+	if (yesOrNoOpen == true){ // unless yes or no is open
+		if (zPressed == true){ // if z is pressed
+			if (yesOrNo == 1){ // and yes or no is set tp yes
 				console.log("yes")
 				BGxPosition = -275
 				BGyPosition = -325
-				stage = 6
+				stage = 6 // go to earth
 				toggleNote = false
 				dialogueOpen = false
 				yesOrNoOpen = false
 			}
-			if (yesOrNo == 2){
+			if (yesOrNo == 2){ // if its set to no
 				console.log("no")
 				yesOrNoOpen = false
-				diologueNumber = 5
+				diologueNumber = 5 // keep everything the same
 				toggleNote = true
 				dialogueOpen = true
 				contiunedDialogue = 0
@@ -983,24 +1016,24 @@ function threeToFour(){ // to the three
 	dialogueOpen = true
 	contiunedDialogue = 5
 }
-function fourToFive(){
+function fourToFive(){ //
 	diologueNumber = 12
 	toggleNote = true
 	dialogueOpen = true
 	contiunedDialogue = 6
 }
 
-function addATKBuff(){
+function addATKBuff(){ // attack buff joins ur team
 	diologueNumber = 21
 	toggleNote = true
 	dialogueOpen = true
 	atkBuff = true
 }
-function setTrue(){
+function setTrue(){ // open text
 	toggleNote = true
 	dialogueOpen = true
 }
-function updateHousePositions(){
+function updateHousePositions(){ // keep the interactables moving with the background
 	bedXPosition = BGxPosition + 690
 	bedYPosition = BGyPosition + 130
 	tvXPosition = BGxPosition + 50
@@ -1012,7 +1045,7 @@ function updateHousePositions(){
 	deskXPosition = BGxPosition + 590
 	deskYPosition = BGyPosition
 }
-function houseThings(){
+function houseThings(){ // draw the interactables in the house
 	if (stage == 5){
 		ctx.drawImage(houseDoor, doorXPosition, doorYPosition)
 		ctx.drawImage(houseBed, bedXPosition, bedYPosition)
@@ -1025,7 +1058,7 @@ function houseThings(){
 		}
 	}
 }
-function updateMarsPositions(){
+function updateMarsPositions(){ // keep the interactables moving with the background
 	marsDoorXPosition = BGxPosition +  2410
 	marsDoorYPosition = BGyPosition + 559
 	cafeXPosition = BGxPosition + 570
@@ -1035,7 +1068,7 @@ function updateMarsPositions(){
 	boardXposition = BGxPosition + 390
 	boardYPosition = BGyPosition + 1572
 }
-function marsThings(){
+function marsThings(){ // draw the interactables on mars
 	if (stage == 4){
 		ctx.drawImage(marsHouseDoor, marsDoorXPosition, marsDoorYPosition)
 		ctx.drawImage(marsFoodCafe, cafeXPosition, cafeYPosition)
@@ -1043,19 +1076,19 @@ function marsThings(){
 		ctx.drawImage(marsNoteBoard, boardXposition, boardYPosition)
 	}
 }
-function updateEarthPositions(){
+function updateEarthPositions(){ // keep the interactables moving with the background
 	tentXPosition = BGxPosition + 2155
 	tentYPosition = BGyPosition + 485
 	trainXPositon = BGxPosition + 1700
 	trainYPosition = BGyPosition + 2425
 }
-function earthThings(){
+function earthThings(){ // draw the interactables on earth
 	if (stage == 6){
 		ctx.drawImage(tentEnterance, tentXPosition, tentYPosition)
 		ctx.drawImage(trainEnterance, trainXPositon, trainYPosition)
 	}
 }
-function updateTentPositions(){
+function updateTentPositions(){ // keep the interactables moving with the background
 	exitxPosition = BGxPosition + 10
 	exityPosition = BGyPosition
 	bullitinxPosition = BGxPosition + 350
@@ -1065,7 +1098,7 @@ function updateTentPositions(){
 	atkBuffXPosition = BGxPosition + 1565
 	atkBuffYPosition = BGyPosition + 280
 }
-function tentThings(){
+function tentThings(){ // draw the interactables in the tent
 	if (stage == 7){
 		ctx.drawImage(tentExit,tentXPosition,tentYPosition)
 		ctx.drawImage(bullitin, bullitinxPosition, bullitinyPosition)
@@ -1074,7 +1107,7 @@ function tentThings(){
 	}
 }
 //#region earth object collisions
-function detectTentCollision(){
+function detectTentCollision(){ // detect collision on the tent enterance
 	if (stage == 6){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= tentXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= tentYPosition && PLAYERXPOSITION <= tentXPosition + 257 && PLAYERYPOSITION <= tentYPosition + 234)
 		{
@@ -1089,7 +1122,7 @@ function detectTentCollision(){
 }
 //#endregion
 //#region tent object collisions
-function detectExitCollision(){
+function detectExitCollision(){ // detect collision on the exit
 	if (stage == 7){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= exitxPosition && PLAYERYPOSITION + PLAYERHEIGHT >= exityPosition && PLAYERXPOSITION <= exitxPosition + 18 && PLAYERYPOSITION <= exityPosition + 369)
 		{
@@ -1102,7 +1135,7 @@ function detectExitCollision(){
 		}
 	}
 }
-function detectbullitinCollision(){
+function detectbullitinCollision(){ // detect collision on the bulliten board
 	if (stage == 7){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= bullitinxPosition && PLAYERYPOSITION + PLAYERHEIGHT >= bullitinyPosition && PLAYERXPOSITION <= bullitinxPosition + 145 && PLAYERYPOSITION <= bullitinxPosition + 98)
 		{
@@ -1115,7 +1148,7 @@ function detectbullitinCollision(){
 		}
 	}
 }
-function detectDrawerCollision(){
+function detectDrawerCollision(){ // detect collision on the drawers
 	if (stage == 7){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= drawersxPosition && PLAYERYPOSITION + PLAYERHEIGHT >= drawersyPosition && PLAYERXPOSITION <= drawersxPosition + 168 && PLAYERYPOSITION <= drawersyPosition + 111)
 		{
@@ -1128,7 +1161,7 @@ function detectDrawerCollision(){
 		}
 	}
 }
-function detectATKBuffCollision(){
+function detectATKBuffCollision(){ // detect collision on the atk buff in tent
 	if (stage == 7){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= atkBuffXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= atkBuffYPosition && PLAYERXPOSITION <= atkBuffXPosition + 55 && PLAYERYPOSITION <= atkBuffYPosition + 90)
 		{
@@ -1143,8 +1176,8 @@ function detectATKBuffCollision(){
 }
 //#endregion
 //#region mars object collisions
-function detectMarsDoorCollision(){
-	if (stage == 4){
+function detectMarsDoorCollision(){ // detect collision on the door to house
+	if (stage == 4){ 
 		if(PLAYERXPOSITION + PLAYERWIDTH >= marsDoorXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= marsDoorYPosition && PLAYERXPOSITION <= marsDoorXPosition + 133 && PLAYERYPOSITION <= marsDoorYPosition + 200)
 		{
 			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
@@ -1156,7 +1189,7 @@ function detectMarsDoorCollision(){
 		}
 	}
 }
-function detectNoteBoardCollision(){
+function detectNoteBoardCollision(){ // detect collision on the noteboard
 	if (stage == 4){
 		if(PLAYERXPOSITION + PLAYERWIDTH > boardXposition && PLAYERYPOSITION + PLAYERHEIGHT >= boardYPosition && PLAYERXPOSITION <= boardXposition + 147 && PLAYERYPOSITION <= boardYPosition + 219)
 		{
@@ -1169,7 +1202,7 @@ function detectNoteBoardCollision(){
 		}
 	}
 }
-function detectLieutenantCollision(){
+function detectLieutenantCollision(){ // detect collision on the lietenant
 	if (stage == 4){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= lieutenantXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= lieutenantYPosition && PLAYERXPOSITION <= lieutenantXPosition + PLAYERWIDTH && PLAYERYPOSITION <= lieutenantYPosition + PLAYERHEIGHT)
 		{
@@ -1180,7 +1213,7 @@ function detectLieutenantCollision(){
 		}
 	}
 }
-function detectCafeCollision(){
+function detectCafeCollision(){ // detect collision on the cafe front
 	if (stage == 4){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= cafeXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= cafeYPosition && PLAYERXPOSITION <= cafeXPosition + 263 && PLAYERYPOSITION <= cafeYPosition + 148)
 		{
@@ -1195,7 +1228,7 @@ function detectCafeCollision(){
 }
 //#endregion
 //#region house object collisions
-function detectDeskCollision(){
+function detectDeskCollision(){ // detect collision on the desk
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= deskXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= deskYPosition && PLAYERXPOSITION <= deskXPosition + 182 && PLAYERYPOSITION <= deskYPosition + 54)
 		{
@@ -1208,7 +1241,7 @@ function detectDeskCollision(){
 		}
 	}
 }
-function detectBedCollision(){
+function detectBedCollision(){ // detect collision on the bed
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= bedXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= bedYPosition && PLAYERXPOSITION <= bedXPosition + 210 && PLAYERYPOSITION <= bedYPosition + 102)
 		{
@@ -1221,7 +1254,7 @@ function detectBedCollision(){
 		}
 	}
 }
-function detectTVCollision(){
+function detectTVCollision(){ // detect collision on the tv
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= tvXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= tvYPosition && PLAYERXPOSITION <= tvXPosition + 225 && PLAYERYPOSITION <= tvYPosition + 141)
 		{
@@ -1235,7 +1268,7 @@ function detectTVCollision(){
 		}
 	}
 }
-function detectStairsCollision(){
+function detectStairsCollision(){ // detect collision on the stairs
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= stairsXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= stairsYPosition && PLAYERXPOSITION <= stairsXPosition + 156 && PLAYERYPOSITION <= stairsYPosition + 93)
 		{
@@ -1249,7 +1282,7 @@ function detectStairsCollision(){
 		}
 	}
 }
-function detectDoorCollision(){
+function detectDoorCollision(){ // detect collision on the door
 	if (stage == 5){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= doorXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= doorYPosition && PLAYERXPOSITION <= doorXPosition + 165 && PLAYERYPOSITION <= doorYPosition + 27)
 		{
@@ -1265,7 +1298,7 @@ function detectDoorCollision(){
 	}
 }
 //#endregion
-function chracterFacing(){
+function chracterFacing(){ // for which way the character is facing depending on which direction was last pressed
 	if (stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8){
 		if (lastPressed == 1){
 			ctx.drawImage(astronautRight,PLAYERXPOSITION,PLAYERYPOSITION,PLAYERWIDTH,PLAYERHEIGHT)
@@ -1280,7 +1313,7 @@ function updateCode(){ // this just takes the input field in the html and puts i
 	codeInput = document.getElementById("enterCode").value
 	//console.log(codeInput)
 }
-function submitCode(){
+function submitCode(){ // when the code button is pressed, check if the code works and implement it, else give an error
 	if (stage == 3){
 		if (codeInput == null || codeInput == ""){ // checks there is acutally a code written in and if there isnt it will give error
 			var warningText = document.getElementById("warningText")
@@ -1320,7 +1353,7 @@ function submitCode(){
 				errorCode.innerHTML = ""
 				BGxPosition = 420 // and this
 				BGyPosition = 69 // and this
-			} else if (codeInput == "188239"){
+			} else if (codeInput == "188239"){ 
 				startingStage = 7
 				atkBuff = true
 				console.log("good code")
@@ -1375,7 +1408,7 @@ function submitCode(){
 }
 //#endregion
 
-function manageFullScreen(){
+function manageFullScreen(){ // some other obscure thing i tried to add to make full screen, might add back later..
 	if (isFullScreen){
 		var canvas = document.getElementById('myCanvas')
 		HEIGHT = 480
@@ -1398,7 +1431,7 @@ window.addEventListener('keydown', keyDownFunction)
 window.addEventListener('keydown', inGameFunction)
 window.addEventListener('keyup', keyUpFunction)
 
-function keyUpFunction(keyboardEvent){
+function keyUpFunction(keyboardEvent){ // sets the moving to false if the key is stopped being held down
 	var keyUp = keyboardEvent.key
 	if (stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8){
 		if (keyUp == "ArrowUp"){ // release up key
@@ -1624,7 +1657,7 @@ function inGameFunction(keyboardEvent){
 							toggleNote = true
 							dialogueOpen = true
 						} else if (atkBuff == true){ // if you do however own the attack buff
-							diologueNumber == 24 // she will point you in the direction of the trainstation
+							diologueNumber = 24 // she will point you in the direction of the trainstation
 							toggleNote = true
 							dialogueOpen = true
 						}
@@ -1684,7 +1717,9 @@ function keyDownFunction(keyboardEvent){
 					BGyPosition = -325
 					stage = 6
 				} else if (startingStage == 2){ //start from stage one earth attack buff teammate
-
+					BGxPosition = -275
+					BGyPosition = -325
+					stage = 6
 				} else if (startingStage == 3){ // start from stage two earth no teammates
 
 				} else if (startingStage == 4){ // start from stage two earth attack buff teammate
