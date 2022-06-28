@@ -1,10 +1,9 @@
 /**
 * Title: pokemon very cool
 * Author: Taison Shea
-* Date: 03/05/22
-* Version: 1
+* Date: 03/05/22 - 27/06/22
+* Version: 27
 * Purpose: get me credits.
-
 **/
 
 const PLAYERWIDTH = 51
@@ -12,8 +11,8 @@ const PLAYERHEIGHT = 74
 const PLAYERXPOSITION = 280
 const PLAYERYPOSITION = 180
 const BACKGROUNDCOLOR = 'rgb(12,12,12)'
-var WIDTH = 640
-var HEIGHT = 480
+var WIDTH = 640  // this is a variable because i wanted to work around with full screen+
+var HEIGHT = 480 // and not full screen, so the width and height wouldnt stay the same
 var isFullScreen = false
 
 var ctx
@@ -44,9 +43,8 @@ var inventoryOpen = false // is the inventory open
 var inventorySelection = 0 // what is selected in the inventory
 var battleSelection = 0 // waht is selected during battle
 var tvToggle = 0 // 0 = off 1 = on
-var dialogueOpen = false
+var dialogueOpen = false 
 var toggleNote = false
-var inBattle = false
 var diologueNumber = 0 // what number to set diologue for
 var yesOrNo = 1 // this is a nightmare
 var yesOrNoOpen = false
@@ -254,6 +252,9 @@ blockSelected.src = 'inventory/BlockSelected.png'
 var runSelected = new Image()
 runSelected.src = 'inventory/RunSelected.png'
 
+// array for zombies
+var zombieArray = []
+
 // extra images
 var interactButton = new Image()
 interactButton.src = 'extraResources/interactButton.png'
@@ -310,6 +311,18 @@ var P6L1 = new Image()
 P6L1.src = 'tutorialText/P6L1.png'
 var P6L2 = new Image()
 P6L2.src = 'tutorialText/P6L2.png'
+var P7 = new Image()
+P7.src = 'tutorialText/P7.png'
+var P8 = new Image()
+P8.src = 'tutorialText/P8.png'
+var P9 = new Image()
+P9.src = 'tutorialText/P9.png'
+var P10 = new Image()
+P10.src = 'tutorialText/P10.png'
+var P11 = new Image()
+P11.src = 'tutorialText/P11.png'
+var P12 = new Image()
+P12.src = 'tutorialText/P12.png'
 var zContune = new Image()
 zContune.src = 'tutorialText/ztocontinue.png'
 //#endregion
@@ -390,7 +403,6 @@ function updateCanvas(){
 	updateMarsPositions()
 	updateEarthPositions()
 	earthThings()
-	manageInventory()
 	detectTentCollision()
 	tentThings()
 	updateTentPositions()
@@ -401,13 +413,14 @@ function updateCanvas(){
 	updateStats()
 
 	//console.log("stage " + stage) //this is my testing console.log
-	//console.log("bgx " + BGxPosition)
-	//console.log("bgy " + BGyPosition)
+	console.log("bgx " + BGxPosition)
+	console.log("bgy " + BGyPosition)
 	//console.log("tent "+ tentYPosition)
-	console.log("atkdmg " + attackDamage)
-	console.log("hp " + health)
+	//console.log("atkdmg " + attackDamage)
+	//console.log("hp " + health)
 	//console.log("def buff " + defBuff)
 	chracterFacing()
+	manageInventory()
 	yesOrNoF()
 	toggleNoteF()
 
@@ -433,7 +446,7 @@ function updateCanvas(){
 		ctx.strokeRect(atkBuffXPosition, atkBuffYPosition, 55, 90) // atk buff character
 	}
 }
-function updateStats(){
+function updateStats(){ // will update stats depending on if you have the buff or not
 	if (atkBuff == true){
 		attackDamage = 7
 	} else if (atkBuff == false){
@@ -446,7 +459,7 @@ function updateStats(){
 	}
 }
 
-function yesOrNoF(){
+function yesOrNoF(){ // updates visual for the yes or no
 	if(yesOrNoOpen == true){ // if the yes or no bar is open
 		if (yesOrNo == 1){ // if its yes
 			ctx.drawImage(yesReady,0,0,WIDTH,HEIGHT) // draw yes
@@ -458,7 +471,7 @@ function yesOrNoF(){
 	}
 }
 //#region tutorialthings
-function manageTutorial(){
+function manageTutorial(){ // updates what is shown for the tutorial and lore
 	if (stage == 1){
 		if (tutorialScreen == 0){ //part one line one
 			ctx.drawImage(P1,0,0, 640, 480)
@@ -513,9 +526,20 @@ function manageTutorial(){
 			ctx.fillStyle = 'white'
 			ctx.drawImage(P6L2,0,200,650,26)
 		} else if (tutorialScreen == 13){
+			ctx.drawImage(P7, 0,0)
+		} else if (tutorialScreen == 14) {
+			ctx.drawImage(P8,0,0)
+		} else if (tutorialScreen == 15) {
+			ctx.drawImage(P9,0,0)
+		} else if (tutorialScreen == 16) {
+			ctx.drawImage(P10,0,0)
+		} else if (tutorialScreen == 17) {
+			ctx.drawImage(P11,0,0)
+		} else if (tutorialScreen == 18) {
+			ctx.drawImage(P12,0,0)
+		} else if (tutorialScreen == 19) {
 			stage = 0
 			tutorialScreen = 0
-			//this is the part where the tutorial actually happens but i need screenshots from game to do that
 		}
 	}
 }
@@ -562,7 +586,7 @@ function mainMenuText(){ // depending on what the player cursor is hovering it w
 }
 //#endregion
 
-function checkStage(){
+function checkStage(){ // will update background based on what stage youre on
 	if (stage == 0){ // main menu and main menu backgrounds
 		ctx.fillStyle = BACKGROUNDCOLOR
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
@@ -582,7 +606,7 @@ function checkStage(){
 		ctx.drawImage(battle, 0,0,WIDTH,HEIGHT)
 	}
 }
-function manageInventory(){
+function manageInventory(){ // updates the visual of the inventory.
 	if(stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8){ // only in active game states
 		if (!inventoryOpen){ // if the inventory isnt open
 			ctx.drawImage(inventoryClosed,0,0) // draw the image of it closed
@@ -596,17 +620,25 @@ function manageInventory(){
 				ctx.drawImage(inventorySave,0,0)
 			}
 		}
+	} else if (stage == 69){
+		if (battleSelection == 0){
+			ctx.drawImage(attackSelected,0,0)
+		} else if (battleSelection == 1){
+			ctx.drawImage(blockSelected,0,0)
+		} else if (battleSelection == 2){
+			ctx.drawImage(runSelected,0,0)
+		}
 	}
  }
 
-function manageMovement(){
+function manageMovement(){ // makes it so that moving in two directions at the same time, wont mess it up
 	if (((movingUp) && (movingLeft)) || ((movingUp) && (movingRight)) || ((movingUp) && (movingDown)) || ((movingLeft) && (movingRight)) || ((movingLeft) && (movingDown)) || ((movingRight) && (movingDown))){ // if any two movement keys are pressed, it will loewr the movement so its the same as if it was only one key pressed
 		moveSpeed = 3.7
 	} else {
 		moveSpeed = 5
 	}
  }
-function moveBackground(){
+function moveBackground(){ // moves the background
 	if (stage == 5){ // only works in the house
 		ctx.fillStyle = BACKGROUNDCOLOR
 		ctx.fillRect(0,0,WIDTH,HEIGHT)
@@ -739,7 +771,7 @@ function moveBackground(){
 	}
 }
 
-function toggleNoteF(){
+function toggleNoteF(){ // updates dialogue for every part of the game
 	if (stage == 5){ // only works in house
 		if (toggleNote == true){ // if note is open
 			if (diologueNumber == 2){ //if the dialogue number is 2
@@ -1425,6 +1457,22 @@ function manageFullScreen(){ // some other obscure thing i tried to add to make 
 		isFullScreen = true
 	}
 }
+/****
+**
+** Class for zombies
+**
+ ****/
+
+class Zombies{
+	constructor(x){
+		this.xPosition = x
+		this.yPosition = y
+	}
+
+	battle(){
+		stage = 69
+	}
+}
 //#region LISTENERS + all keyboard interactions
 
 window.addEventListener('keydown', keyDownFunction)
@@ -1777,6 +1825,23 @@ function keyDownFunction(keyboardEvent){
 		if (keyDown == 'z' || keyDown == 'Z'){
 			if (codeSelection == 0){
 				stage = 0
+			}
+		}
+	}  else if (stage == 69){
+		if (keyDown == 'ArrowLeft'){ // if youve reached the lowest you can go, dont go lower, if no go one lower.
+			if (battleSelection <= 0)
+			{
+				battleSelection = 0
+			} else {
+				battleSelection--
+			}
+		}
+		if (keyDown == 'ArrowRight'){ // if youve reached the highest you can go, dont go higher, if not go one higher
+			if (battleSelection >= 2)
+			{
+				battleSelection = 2
+			} else {
+				battleSelection++
 			}
 		}
 	}
