@@ -73,6 +73,10 @@ var yesOrNoOpen = false
 // 21 = you have recieved the atk buff
 // 23 = no one is working the food stand right now
 // 24 = point in the direction of the train station
+// 25 = saved train no atk
+// 26 = the door locks behind you
+// 27 = 186635
+// 28 = 187812
 //#endregion
 var contiunedDialogue = 0
 var dia0 = new Image()
@@ -105,6 +109,8 @@ var dia23 = new Image()
 dia23.src = 'dialogue/dia23.png'
 var dia24 = new Image()
 dia24.src = 'dialogue/dia24.png'
+var dia26 = new Image()
+dia26.src = 'dialogue/dia26.png'
 
 var yesReady = new Image()
 yesReady.src = 'dialogue/yesReady.png'
@@ -117,6 +123,8 @@ var startingStage = 0
 //#region save screens
 var SavedTooEarly = new Image() // when you try to save in mars
 SavedTooEarly.src = 'inventory/GameSavedTooEarly.png'
+var cantSave = new Image() // trying to save in the office, or in the boss battle area
+cantSave.src = 'inventory/YouCantSaveHere.png'
 var SavedEarthOne = new Image() // when you save on earth stage one without getting a teammate
 SavedEarthOne.src = 'inventory/GameSaved186010.png'
 var SavedEarthOneATK = new Image() // when you save on earth stage one with the attack buff teammate
@@ -133,6 +141,10 @@ var SavedTent = new Image() // saving the game in the tent, no attack buff
 SavedTent.src = 'inventory/GameSaved188565.png'
 var savedTentATK = new Image() // saving the game in the tent, attack buff present
 savedTentATK.src = 'inventory/GameSaved188239.png'
+var savedTrain = new Image() // saving in train no buffs
+savedTrain.src = 'inventory/GameSaved184372.png'
+var savedTrainATK = new Image() // saving train with ATK Buffs
+savedTrainATK.src = 'inventory/GameSaved187812.png'
 //#endregion
 //#region teammates
 var team0 = new Image() // just you
@@ -202,7 +214,7 @@ trainEnterance.src = 'Earth/trainEnterance.png'
 
 var tentXPosition = 0 // width = 247
 var tentYPosition = 0  // height = 234
-var trainXPositon = 0 // width = 282
+var trainXPosition = 0 // width = 282
 var trainYPosition = 0 // hieght = 357
 
 //variables for things in the tent
@@ -221,6 +233,13 @@ var drawersxPosition = 0 // wdith = 168
 var drawersyPosition = 0 // height = 111
 var atkBuffXPosition = 0 // width = 55
 var atkBuffYPosition = 0 // height = 90
+
+// variables for train station
+var officeEnterance = new Image()
+officeEnterance.src = 'train/officedoor.png'
+
+var officexPosition = 0 // width = 136
+var officeyPosition = 0 // height = 210
 
 //tutorial variables
 var tutorialScreen = 0
@@ -368,6 +387,8 @@ var earthBackground = new Image()
 earthBackground.src = 'backgrounds/earthTest.png'
 var tentBackground = new Image()
 tentBackground.src = 'backgrounds/tentbackground.png'
+var trainBackground = new Image()
+trainBackground.src = 'backgrounds/backgroundSubway.png'
 
 //starts the canvas when the window opens
 window.onload=startCanvas
@@ -376,6 +397,22 @@ function startCanvas(){
 	isFullScreen = false
 	ctx=document.getElementById("myCanvas").getContext("2d")
 	timer = setInterval(updateCanvas, 20) // set framerate
+
+	zSpawned = 0
+	while(zSpawned < 3){
+		zombieArray.push(new Zombie(BGxPosition + Math.random() * 1000,BGyPosition + Math.random() * 1000,20))
+		zSpawned++
+	}
+	console.log("total zombies: " + zombieArray.length)
+	console.log("zombie 1 x: " + zombieArray[0].xPosition)
+	console.log("zombie 1 y: " + zombieArray[0].yPosition)
+	console.log("zombie 1 hp: " + zombieArray[0].hp)
+	console.log("zombie 2 x: " + zombieArray[1].xPosition)
+	console.log("zombie 2 y: " + zombieArray[1].yPosition)
+	console.log("zombie 2 hp: " + zombieArray[1].hp)
+	console.log("zombie 3 x: " + zombieArray[2].xPosition)
+	console.log("zombie 3 y: " + zombieArray[2].yPosition)
+	console.log("zombie 3 hp: " + zombieArray[2].hp)
 }
 function updateCanvas(){
 	// reset the canvas
@@ -404,17 +441,38 @@ function updateCanvas(){
 	updateEarthPositions()
 	earthThings()
 	detectTentCollision()
+	detectTrainCollision()
 	tentThings()
 	updateTentPositions()
 	detectExitCollision()
 	detectbullitinCollision()
+	trainThings()
+	updateTrainPositions()
+	detectOfficeCollision()
+	detectTrainExit()
 	detectDrawerCollision()
 	detectATKBuffCollision()
 	updateStats()
 
+	if (stage == 6){
+		var zSpawned = 0
+		while (zSpawned < zombieArray.length){
+			zombieArray[zSpawned].detectCollision()
+			ctx.drawImage(zombieIdle, zombieArray[zSpawned].xPosition, zombieArray[zSpawned].yPosition, 51, 74)
+			zSpawned++
+		}
+	}	
+	console.log("zombie 1 x: " + zombieArray[0].xPosition)
+	console.log("zombie 1 y: " + zombieArray[0].yPosition)
+	console.log("zombie 2 x: " + zombieArray[1].xPosition)
+	console.log("zombie 2 y: " + zombieArray[1].yPosition)
+	console.log("zombie 3 x: " + zombieArray[2].xPosition)
+	console.log("zombie 3 y: " + zombieArray[2].yPosition)
+	
+
 	//console.log("stage " + stage) //this is my testing console.log
-	console.log("bgx " + BGxPosition)
-	console.log("bgy " + BGyPosition)
+	//console.log("bgx " + BGxPosition)
+	//console.log("bgy " + BGyPosition)
 	//console.log("tent "+ tentYPosition)
 	//console.log("atkdmg " + attackDamage)
 	//console.log("hp " + health)
@@ -444,6 +502,8 @@ function updateCanvas(){
 		ctx.strokeRect(bullitinxPosition, bullitinyPosition, 145, 98) // bullitin
 		ctx.strokeRect(drawersxPosition, drawersyPosition, 168, 111)//drwaers
 		ctx.strokeRect(atkBuffXPosition, atkBuffYPosition, 55, 90) // atk buff character
+	} else if (stage == 8){
+		ctx.strokeRect(officexPosition,officeyPosition,136,210) // office door
 	}
 }
 function updateStats(){ // will update stats depending on if you have the buff or not
@@ -738,7 +798,7 @@ function moveBackground(){ // moves the background
 			
 		}
 		if(movingRight){
-			if (BGxPosition >= -2350){ // if not touching the edge
+			if (BGxPosition >= -2400){ // if not touching the edge
 				BGxPosition = BGxPosition - moveSpeed // move the background
 			} else { // if it is
 				BGxPosition = BGxPosition // keep it the same
@@ -760,7 +820,28 @@ function moveBackground(){ // moves the background
 			}
 		}
 		if(movingRight){
-			if (BGxPosition >= -1340){ // if not touching the edge
+			if (BGxPosition >= -1700){ // if not touching the edge
+				BGxPosition = BGxPosition - moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+		}
+		//console.log("bg X: " + BGxPosition)
+		//console.log("bg Y: " + BGyPosition)
+	}
+	if (stage == 8){ // only works in the train station
+		ctx.fillStyle = BACKGROUNDCOLOR
+		ctx.fillRect(0,0,WIDTH,HEIGHT)
+		ctx.drawImage(trainBackground,BGxPosition, BGyPosition)
+		if(movingLeft){
+			if (BGxPosition <= 270){ // if not touching the edge
+				BGxPosition = BGxPosition + moveSpeed // move the background
+			} else { // if it is
+				BGxPosition = BGxPosition // keep it the same
+			}
+		}
+		if(movingRight){
+			if (BGxPosition >= -2275){ // if not touching the edge
 				BGxPosition = BGxPosition - moveSpeed // move the background
 			} else { // if it is
 				BGxPosition = BGxPosition // keep it the same
@@ -897,6 +978,11 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 				contiunedDialogue = 0
 				setTimeout(() => {checkZ();}, 250)
 			}
+			if (diologueNumber == 27){
+				ctx.drawImage(SavedEarthOneATK,0,0)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
 			if (toggleNote == true){
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
@@ -980,6 +1066,47 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 					contiunedDialogue = 0
 					setTimeout(() => {checkZ();}, 250)
 				}
+			}
+		}
+	} else if (stage == 8){ // in trian station
+		if (toggleNote == true){
+			if (diologueNumber == 25){
+				ctx.drawImage(savedTrain,0,0)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 28){
+				ctx.drawImage(savedTrainATK,0,0)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 26){
+				ctx.drawImage(dia26, 0,0)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+		}
+		if (toggleNote == true){ // i do toggle note again just so i know where the team cut off is
+			if(diologueNumber == 13){ // no buffs
+				ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if(diologueNumber == 14){ // only atk buff
+				ctx.drawImage(team1,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+
+			}
+			if(diologueNumber == 15){ // only def buff
+				ctx.drawImage(team2,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if(diologueNumber == 16){ // atk and def buff
+				ctx.drawImage(team3,0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 250)
 			}
 		}
 	}
@@ -1138,10 +1265,32 @@ function tentThings(){ // draw the interactables in the tent
 		ctx.drawImage(atkBuffC, atkBuffXPosition, atkBuffYPosition)
 	}
 }
+function updateTrainPositions(){
+	officexPosition = BGxPosition + 910
+	officeyPosition = BGyPosition + 125
+}
+function trainThings(){
+	if (stage == 8){
+		ctx.drawImage(officeEnterance, officexPosition, officeyPosition)
+	}
+}
 //#region earth object collisions
 function detectTentCollision(){ // detect collision on the tent enterance
 	if (stage == 6){
 		if(PLAYERXPOSITION + PLAYERWIDTH >= tentXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= tentYPosition && PLAYERXPOSITION <= tentXPosition + 257 && PLAYERYPOSITION <= tentYPosition + 234)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			//console.log("touching tent enterance")
+			return(true)
+		}else{
+			//console.log("not touching tent enterance")
+			return(false)
+		}
+	}
+}
+function detectTrainCollision(){ // detect collision on the train station enterance
+	if (stage == 6){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= trainXPosition && PLAYERYPOSITION + PLAYERHEIGHT >= trainYPosition && PLAYERXPOSITION <= trainXPosition + 282 && PLAYERYPOSITION <= trainYPosition + 357)
 		{
 			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
 			//console.log("touching tent enterance")
@@ -1330,6 +1479,30 @@ function detectDoorCollision(){ // detect collision on the door
 	}
 }
 //#endregion
+//#regiion train object collisions
+function detectOfficeCollision(){ // detect collision on the desk
+	if (stage == 8){
+		if(PLAYERXPOSITION + PLAYERWIDTH >= officexPosition && PLAYERYPOSITION + PLAYERHEIGHT >= officeyPosition && PLAYERXPOSITION <= officexPosition + 136 && PLAYERYPOSITION <= officeyPosition + 210)
+		{
+			ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+			//console.log("touching bed")
+			return(true)
+		}else{
+			//console.log("not touching bed")
+			return(false)
+		}
+	}
+}
+function detectTrainExit(){ // detect collision on the desk
+	if (stage == 8){
+		if(BGxPosition <= -2275)
+		{
+			stage = 10
+			//wait abit before toggling the diologue
+		}
+	}
+}
+//#endregion
 function chracterFacing(){ // for which way the character is facing depending on which direction was last pressed
 	if (stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8){
 		if (lastPressed == 1){
@@ -1353,7 +1526,7 @@ function submitCode(){ // when the code button is pressed, check if the code wor
 			errorCode.innerHTML = "Error Code: 131202"
 			warningText.innerHTML = "Please enter a code <br> Press x to close this notice"
 		} else { // if there is a code it checks it with the following list
-			if(codeInput == "186010"){ // will send you to the first stage on earth no teammates
+			if(codeInput == "186010"){ // will send you to earth with no teammates
 				startingStage = 1
 				atkBuff = false
 				console.log("good code")
@@ -1364,7 +1537,7 @@ function submitCode(){ // when the code button is pressed, check if the code wor
 				errorCode.innerHTML = ""
 				BGxPosition = 69 //change this
 				BGyPosition = 420 // and this
-			} else if (codeInput == "188565"){//sends you to the tent
+			} else if (codeInput == "188565"){//sends you to the tent no teammates
 				startingStage = 7
 				atkBuff = false
 				console.log("good code")
@@ -1374,7 +1547,7 @@ function submitCode(){ // when the code button is pressed, check if the code wor
 				warningText.innerHTML = ""
 				errorCode.innerHTML = ""
 			}
-			else if (codeInput == "186635"){ // sends you to first stage on earth attack buff teammate
+			else if (codeInput == "186635"){ // sends you to earth with attack buff teammate
 				startingStage = 2
 				atkBuff = true
 				console.log("good code")
@@ -1385,7 +1558,7 @@ function submitCode(){ // when the code button is pressed, check if the code wor
 				errorCode.innerHTML = ""
 				BGxPosition = 420 // and this
 				BGyPosition = 69 // and this
-			} else if (codeInput == "188239"){ 
+			} else if (codeInput == "188239"){ // tent with attack buff
 				startingStage = 7
 				atkBuff = true
 				console.log("good code")
@@ -1394,16 +1567,22 @@ function submitCode(){ // when the code button is pressed, check if the code wor
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
 				errorCode.innerHTML = ""
-			} else if (codeInput == "asdasd"){ // sends you to right before final boss battle
-				startingStage = 3
+			} else if (codeInput == "184372"){ // trainstation with no buffs
+				startingStage = 8
 				console.log("good code")
 				goodCode = true
 				var warningText = document.getElementById("warningText")
 				var errorCode = document.getElementById("errorCode")
 				warningText.innerHTML = ""
 				errorCode.innerHTML = ""
-				BGxPosition = 64 // and this
-				BGyPosition = 9020 // and even this
+			} else if (codeInput == "187812"){ // trainstation attack buff
+				startingStage = 8
+				atkBuff = true
+				goodCode = true
+				var warningText = document.getElementById("warningText")
+				var errorCode = document.getElementById("errorCode")
+				warningText.innerHTML = ""
+				errorCode.innerHTML = ""
 			} else if (codeInput == "entergodmodelmao"){ //gives you god mode
 				//give god mode
 				atkBuff = true
@@ -1461,16 +1640,26 @@ function manageFullScreen(){ // some other obscure thing i tried to add to make 
 **
 ** Class for zombies
 **
- ****/
-
-class Zombies{
-	constructor(x){
+****/
+class Zombie{
+	constructor(x,y,hp){
 		this.xPosition = x
 		this.yPosition = y
+		this.hp = hp
 	}
 
-	battle(){
-		stage = 69
+	detectCollision(){
+		if (stage == 6){
+			if(PLAYERXPOSITION + PLAYERWIDTH >= this.xPosition && PLAYERYPOSITION + PLAYERHEIGHT >= this.yPosition && PLAYERXPOSITION <= this.xPosition + 51 && PLAYERYPOSITION <= this.yPosition + 74)
+			{
+				ctx.drawImage(interactButton, PLAYERXPOSITION + 15, PLAYERYPOSITION - 30, 25, 25)
+				console.log("touching zombie")
+				return(true)
+			}else{
+				console.log("not touching zombie")
+				return(false)
+			}
+		}
 	}
 }
 //#region LISTENERS + all keyboard interactions
@@ -1592,11 +1781,19 @@ function inGameFunction(keyboardEvent){
 						diologueNumber = 6
 						toggleNote = true
 						dialogueOpen = true
-					} else if (stage == 6){ // earth stage 1
-						console.log("Saved Stage: Give code: 186010")
-						diologueNumber = 7
-						toggleNote = true
-						dialogueOpen = true
+					} else if (stage == 6){ // earth stage 
+						if (atkBuff == false){
+							console.log("Saved Stage: Give code: 186010")
+							diologueNumber = 7
+							toggleNote = true
+							dialogueOpen = true
+						} else if (atkBuff == true){
+							console.log("Saved Stage: Give code: 186635")
+							diologueNumber = 27
+							toggleNote = true
+							dialogueOpen = true
+						}
+						
 					} else if (stage == 7){ // inside the tent
 						if (atkBuff == false){
 							console.log("Saved Stage: Give code: 188565")
@@ -1610,7 +1807,17 @@ function inGameFunction(keyboardEvent){
 							dialogueOpen = true
 						}
 					} else if (stage == 8){ // in train station
-						
+						if (atkBuff == false){
+							console.log("Saved Stage: Give code: 184372")
+							diologueNumber = 25
+							toggleNote = true
+							dialogueOpen = true
+						} else if (atkBuff == true){
+							console.log("Saved Stage: Give Code: 187812")
+							diologueNumber = 28
+							toggleNote = true
+							dialogueOpen = true
+						}
 					}
 				}
 			} else if (!inventoryOpen) { // if inventory is closed
@@ -1681,7 +1888,17 @@ function inGameFunction(keyboardEvent){
 						lastPressed = 1
 						BGxPosition = 250
 						BGyPosition = -120
-					}				
+					}
+					if (detectTrainCollision()){
+						console.log("go to train station")
+						stage = 8
+						lastPressed = 1
+						BGxPosition = 250
+						BGyPosition = -100
+						diologueNumber = 26
+						toggleNote = true
+						dialogueOpen = true
+					}			
 				} else if (stage == 7){ // if in the tent
 					if (detectExitCollision()){
 						console.log("go to earth")
@@ -1709,8 +1926,13 @@ function inGameFunction(keyboardEvent){
 							toggleNote = true
 							dialogueOpen = true
 						}
-				
 					}
+				} else if (stage == 8){ // if in train station
+					if (detectOfficeCollision()){
+						stage = 9
+					}
+				} else if (stage == 9){ // train station office
+
 				}
 			}
 			//console.log("z pressed")
@@ -1780,8 +2002,11 @@ function keyDownFunction(keyboardEvent){
 					BGxPosition = 200
 					BGyPosition = -114
 					stage = 7
-				} else if (startingStage == 8){ // start from right before boss battle attack buff teammate
-
+				} else if (startingStage == 8){ // start from trainstation no teammates
+					stage = 8
+					lastPressed = 1
+					BGxPosition = 250
+					BGyPosition = -100
 				} else if (startingStage == 9){ // start from right before boss battle defence buff teammate
 
 				} else if (startingStage == 10){ // start from right before boss battle both teammates
