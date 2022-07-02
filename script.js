@@ -1189,22 +1189,22 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 		}
 		if (diologueNumber == 34){
 			ctx.drawImage(dia34, 0,0)
-			contiunedDialogue = 0
+			contiunedDialogue = 17
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 35){
 			ctx.drawImage(dia35, 0,0)
-			contiunedDialogue = 0
+			contiunedDialogue = 17
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 36){
 			ctx.drawImage(dia36, 0,0)
-			contiunedDialogue = 0
+			contiunedDialogue = 17
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 37){
 			ctx.drawImage(dia37, 0,0)
-			contiunedDialogue = 0
+			contiunedDialogue = 17
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 38){
@@ -1275,6 +1275,11 @@ function checkZ(){ // check if z is pressed
 				toggleNote = false
 				dialogueOpen = false
 				return;
+			} else if (contiunedDialogue == 17){
+				setTimeout(() => {zombiesTurn();}, 250)
+				toggleNote = false
+				dialogueOpen = false
+				return;
 			}
 		}
 	}
@@ -1311,6 +1316,9 @@ function fourToFive(){ //
 function playersTurn(){
 	turn = 0
 }
+function zombiesTurn(){
+	turn = 1
+}
 function addATKBuff(){ // attack buff joins ur team
 	diologueNumber = 21
 	toggleNote = true
@@ -1328,37 +1336,85 @@ function startBattle(Zlocation, Zhealth){
 	var zombieLocation = Zlocation
 	var block = false
 	stage = 69
-	do {
-		if (health > 0 && zombieHP > 0){
-			if (turn == 0){
-				if (zPressed){
-					if (battleSelection == 0){
-						console.log("attack	")
-					} else if (battleSelection == 1){
-						console.log("block")
-						block = true
-					} else if (battleSelection == 2){
-						console.log("try to run")
-					}
-				}
-			} else if (turn == 1){
-				var attack = Math.random() * 10
-				if (block == true){
-					health = health - 1
-				} else if (block == false){
-					if (attack >= 9){
-						health = health - 12
+	console.log("stage isnt changing AH")
+	while (health > 0 || zombieHP > 0){
+		console.log("test 1")
+		if (turn == 0){
+			console.log("test 2")
+			if (zPressed){
+				if (battleSelection == 0){ // if selected attack
+					console.log("attack")
+					var attack = Math.random() * 10
+					if (atkBuff == true){
+						if (attack > 5){
+							zombieHP = zombieHP - 4
+							diologueNumber = 34
+							toggleNote = true
+							dialogueOpen = true
+							turn = 1
+						} else {
+							zombieHP = zombieHP - 4
+							diologueNumber = 35
+							toggleNote = true
+							dialogueOpen = true
+							turn = 1
+						}
 					} else {
-						health = health - 4
+						if (attack > 5){
+							zombieHP = zombieHP - 7
+							diologueNumber = 36
+							toggleNote = true
+							dialogueOpen = true
+							turn = 1
+						} else {
+							zombieHP = zombieHP - 7
+							diologueNumber = 37
+							toggleNote = true
+							dialogueOpen = true
+							turn = 1
+						}
+					}
+				} else if (battleSelection == 1){ // if selected block
+					console.log("block")
+					block = true
+					turn = 1
+				} else if (battleSelection == 2){ // if selected run
+					console.log("run")
+					if (zombieLocation == 'Office'){
+						diologueNumber = 41
+						toggleNote = true
+						dialogueOpen = true
 					}
 				}
 			}
-		} else if (zombieHP <= 0){
-			stage  = 9
-		} else if (health <= 0){
-			stage = 9
+		} else {
+			console.log("test 3")
+			var Zattack = Math.random() * 10
+			if (block == true){
+				health = health - 1
+				block = false
+				diologueNumber = 40
+				toggleNote = true
+				dialogueOpen = true
+				turn = 0
+			} else {
+				if (Zattack > 90){
+					diologueNumber = 39
+					toggleNote = true
+					dialogueOpen = true
+					health = health - 12
+					turn = 0
+				} else {
+					diologueNumber = 38
+					toggleNote = true
+					dialogueOpen = true
+					health = health - 4
+					turn = 0
+				}
+			}
+			
 		}
-	} while (stage == 69)
+	}
 }
 function setTrue(){ // open text
 	toggleNote = true
