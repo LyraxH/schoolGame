@@ -6,10 +6,6 @@
 * Purpose: get me credits.
 **/
 
-var zombieHP = 0 //CHANGED
-var zombieLocation = 0 //CHANGED
-var block
-
 const PLAYERWIDTH = 51
 const PLAYERHEIGHT = 74
 const BACKGROUNDCOLOR = 'rgb(12,12,12)'
@@ -53,6 +49,9 @@ var diologueNumber = 0 // what number to set diologue for
 var yesOrNo = 1 // this is a nightmare
 var yesOrNoOpen = false
 var turn = 0 // 0 = players turn, 1 = zombies turn
+var zombieHP = 0
+var zombieLocation = 0
+var block = false
 //#region diologue Numbers
 // 0 = cant go upstairs in house
 // 1 = go to sleep
@@ -419,6 +418,8 @@ P6.src = 'backgrounds/P6.png' // earth jungle
 
 var battle = new Image()
 battle.src = 'ExtraResources/Battle.png'
+var nothing = new Image()
+nothing.src = 'ExtraResources/nothing.png'
 //#endregion
 
 var marsBackground = new Image()
@@ -497,6 +498,7 @@ function updateCanvas(){
 	manageInventory()
 	yesOrNoF()
 	toggleNoteF()
+	//console.log(turn)
 
 	ctx.strokeStyle = "rgb(0,255,0)" // Draw the hitboxes bright green
 	if (stage == 5){
@@ -1189,58 +1191,59 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			}
 		}
 	} else if (stage == 69){ // if in battle
-		if (diologueNumber == 41){
-			ctx.drawImage(cantRun, 0,0)
-			contiunedDialogue = 0
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 42){
-			ctx.drawImage(dia42, 0,0)
-			contiunedDialogue = 17
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 34){
-			ctx.drawImage(dia34, 0,0)
-			contiunedDialogue = 17
-			zombieHP = zombieHP - 4
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 35){
-			ctx.drawImage(dia35, 0,0)
-			contiunedDialogue = 17
-			zombieHP = zombieHP - 4
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 36){
-			ctx.drawImage(dia36, 0,0)
-			contiunedDialogue = 17
-			zombieHP = zombieHP - 7
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 37){
-			ctx.drawImage(dia37, 0,0)
-			contiunedDialogue = 17
-			zombieHP = zombieHP - 7
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 38){
-			ctx.drawImage(dia38, 0,0)
-			contiunedDialogue = 16
-			health = health - 4
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 39){
-			ctx.drawImage(dia39, 0,0)
-			contiunedDialogue = 16
-			health = health - 12
-			setTimeout(() => {checkZ();}, 250)
-		}
-		if (diologueNumber == 40){
-			ctx.drawImage(dia40, 0,0)
-			contiunedDialogue = 16
-			health--
-			block = false
-			setTimeout(() => {checkZ();}, 250)
+		if (toggleNote == true){
+			if (diologueNumber == 41){
+				ctx.drawImage(cantRun,0,0)
+				contiunedDialogue = 17
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 42){
+				ctx.drawImage(dia42, 0,0)
+				contiunedDialogue = 17
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 34){
+				ctx.drawImage(dia34, 0,0)
+				contiunedDialogue = 17
+				zombieHP = zombieHP - 4
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 35){
+				ctx.drawImage(dia35, 0,0)
+				contiunedDialogue = 17
+				zombieHP = zombieHP - 4
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 36){
+				ctx.drawImage(dia36, 0,0)
+				contiunedDialogue = 17
+				zombieHP = zombieHP - 7
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 37){
+				ctx.drawImage(dia37, 0,0)
+				contiunedDialogue = 17
+				zombieHP = zombieHP - 7
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 38){
+				ctx.drawImage(dia38, 0,0)
+				contiunedDialogue = 16
+				health = health - 4
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 39){
+				ctx.drawImage(dia39, 0,0)
+				contiunedDialogue = 16
+				health = health - 12
+				setTimeout(() => {checkZ();}, 250)
+			}
+			if (diologueNumber == 40){
+				ctx.drawImage(dia40, 0,0)
+				contiunedDialogue = 16
+				health--
+				setTimeout(() => {checkZ();}, 250)
+			}
 		}
 	}
 }
@@ -1294,12 +1297,12 @@ function checkZ(){ // check if z is pressed
 			if (contiunedDialogue == 16){
 				toggleNote = false
 				dialogueOpen = false
-				playersTurn()
+				setTimeout(() => {playersTurn();}, 100)
 			}
 			if (contiunedDialogue == 17){
 				toggleNote = false
 				dialogueOpen = false
-				zombiesTurn()
+				setTimeout(() => {zombiesTurn();}, 100)
 			}
 		}
 	}
@@ -1334,15 +1337,14 @@ function fourToFive(){ //
 	contiunedDialogue = 6
 }
 function playersTurn(){
-	toggleNote = false
-	dialogueOpen = false
+	manageInventory()
+	diologueNumber = 420
+	block = false
+	battleSelection = 0
 	turn = 0
 	console.log("palyers turn")
 }
 function zombiesTurn(){
-	toggleNote = false
-	dialogueOpen = false
-	battleSelection = 0
 	turn = 1
 	console.log("zombies turn")
 }
@@ -1359,84 +1361,90 @@ function zombAttacks(){
 }
 function startBattle(Zlocation, Zhealth){
 	console.log("Started battle")
-	zombieHP = Zhealth //CHANGED
-	zombieLocation = Zlocation //CHANGED
-	block = false //CHANGED
+	zombieHP = Zhealth
+	zombieLocation = Zlocation
+	block = false
 	stage = 69
-  //CHANGED
 }
 function checkBattle(){
 	if (stage == 69){
-		if (turn == 0){
-			if (zPressed){
-				if (battleSelection == 0){
-					var attack = Math.random() * 10
-					if (atkBuff == false){
-						if (attack > 5){
-							diologueNumber = 34
-							toggleNote = true
-							dialogueOpen = true
-							battleSelection = 4
-							zPressed = false
+		if (health  > 0 || zombieHP > 0){
+			if (turn == 0){
+				if (zPressed){
+					if (battleSelection == 0){
+						var attack = Math.random() * 10
+						if (atkBuff == false){
+							if (attack > 5){
+								diologueNumber = 34
+								toggleNote = true
+								dialogueOpen = true
+								battleSelection = 4
+								zPressed = false
+							} else {
+								diologueNumber = 35
+								toggleNote = true
+								dialogueOpen = true
+								battleSelection = 4
+								zPressed = false
+							}
 						} else {
-							diologueNumber = 35
-							toggleNote = true
-							dialogueOpen = true
-							battleSelection = 4
-							zPressed = false
+							if (attack > 5){
+								diologueNumber = 36
+								toggleNote = true
+								dialogueOpen = true
+								battleSelection = 4
+								zPressed = false
+							} else {
+								diologueNumber = 37
+								toggleNote = true
+								dialogueOpen = true
+								battleSelection = 4
+								zPressed = false
+							}
 						}
-					} else {
-						if (attack > 5){
-							diologueNumber = 36
-							toggleNote = true
-							dialogueOpen = true
-							battleSelection = 4
-							zPressed = false
-						} else {
-							diologueNumber = 37
-							toggleNote = true
-							dialogueOpen = true
-							battleSelection = 4
-							zPressed = false
-						}
+					} else if (battleSelection == 1){
+						console.log('block')
+						block = true
+						diologueNumber = 42
+						toggleNote = true
+						dialogueOpen = true
+						battleSelection = 4
+						zPressed = false
+					} else if (battleSelection == 2){
+						console.log('run')
+						diologueNumber = 41
+						toggleNote = true
+						dialogueOpen = true
+						battleSelection = 4
+						zPressed = false
 					}
-				} else if (battleSelection == 1){
-					console.log('block')
-					block = true
-					diologueNumber = 42
-					toggleNote = true
-					dialogueOpen = true
-					battleSelection = 4
-					zPressed = false
-				} else if (battleSelection == 2){
-					console.log('run')
-					diologueNumber = 41
-					toggleNote = true
-					dialogueOpen = true
-					battleSelection = 4
-					zPressed = false
-				}
-			}
-		} else {
-			if (block == false){
-				if (zAttack > 9){
-					var zAttack = Math.random() * 10
-					//console.log("heavy attack")
-					diologueNumber = 39
-					toggleNote = true
-					dialogueOpen = true
-				} else {
-					//console.log("light attack")
-					diologueNumber = 38
-					toggleNote = true
-					dialogueOpen = true
 				}
 			} else {
-				console.log("blocked attack")
-				diologueNumber = 40
-				toggleNote = true
-				dialogueOpen = true
+				if (block == false){
+					if (zAttack > 9){
+						var zAttack = Math.random() * 10
+						//console.log("heavy attack")
+						diologueNumber = 39
+						toggleNote = true
+						dialogueOpen = true
+					} else {
+						//console.log("light attack")
+						diologueNumber = 38
+						toggleNote = true
+						dialogueOpen = true
+					}
+				} else {
+					console.log("blocked attack")
+					diologueNumber = 40
+					toggleNote = true
+					dialogueOpen = true
+				}
 			}
+		}
+		if (health <= 0){
+			console.log("kill player")
+		} else if (zombieHP <= 0){
+			console.log("kill zombie")
 		}
 	}
 }
@@ -2213,7 +2221,6 @@ function inGameFunction(keyboardEvent){
 						
 					}
   				} else if (stage == 69){
-  					//CHANGED
         			checkBattle()
 				}
 			}
@@ -2350,9 +2357,9 @@ function keyDownFunction(keyboardEvent){
 		}
 	}
 }
-window.addEventListener("keydown", function(e) { // this is something i learned from google to prevent scrolling and stuff like that
-    if(["Space","ArrowUp","ArrowDown"].indexOf(e.code) > -1) {
-        e.preventDefault();
+window.addEventListener("keydown", function(e) { // this is something i learned from google to prevent scrolling and stuff like that 
+    if(["Space","ArrowUp","ArrowDown"].indexOf(e.code) > -1) { // complettly forgot where i learnt it from, so sorry about that.
+        e.preventDefault(); 
     }
 }, false);
 //#endregion
