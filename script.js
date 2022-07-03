@@ -6,6 +6,10 @@
 * Purpose: get me credits.
 **/
 
+var zombieHP = 0 //CHANGED
+var zombieLocation = 0 //CHANGED
+var block
+
 const PLAYERWIDTH = 51
 const PLAYERHEIGHT = 74
 const BACKGROUNDCOLOR = 'rgb(12,12,12)'
@@ -142,6 +146,8 @@ var dia32 = new Image()
 dia32.src = 'dialogue/dia32.png'
 var dia33 = new Image()
 dia33.src = 'dialogue/dia33.png'
+var dia42 = new Image()
+dia42.src = 'dialogue/dia42.png'
 
 var yesReady = new Image()
 yesReady.src = 'dialogue/yesReady.png'
@@ -476,6 +482,7 @@ function updateCanvas(){
 	detectTrainExit()
 	detectDrawerCollision()
 	detectATKBuffCollision()
+	checkBattle()
 
 	//console.log("stage " + stage) //this is my testing console.log
 	//console.log("bgx " + BGxPosition)
@@ -485,7 +492,7 @@ function updateCanvas(){
 	//console.log("hp " + health)
 	//console.log("def buff " + defBuff)
 	//console.log(Math.random() * 10)
-	console.log(zPressed)
+	//console.log(zPressed)
 	chracterFacing()
 	manageInventory()
 	yesOrNoF()
@@ -1187,39 +1194,52 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			contiunedDialogue = 0
 			setTimeout(() => {checkZ();}, 250)
 		}
+		if (diologueNumber == 42){
+			ctx.drawImage(dia42, 0,0)
+			contiunedDialogue = 17
+			setTimeout(() => {checkZ();}, 250)
+		}
 		if (diologueNumber == 34){
 			ctx.drawImage(dia34, 0,0)
 			contiunedDialogue = 17
+			zombieHP = zombieHP - 4
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 35){
 			ctx.drawImage(dia35, 0,0)
 			contiunedDialogue = 17
+			zombieHP = zombieHP - 4
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 36){
 			ctx.drawImage(dia36, 0,0)
 			contiunedDialogue = 17
+			zombieHP = zombieHP - 7
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 37){
 			ctx.drawImage(dia37, 0,0)
 			contiunedDialogue = 17
+			zombieHP = zombieHP - 7
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 38){
 			ctx.drawImage(dia38, 0,0)
 			contiunedDialogue = 16
+			health = health - 4
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 39){
 			ctx.drawImage(dia39, 0,0)
 			contiunedDialogue = 16
+			health = health - 12
 			setTimeout(() => {checkZ();}, 250)
 		}
 		if (diologueNumber == 40){
 			ctx.drawImage(dia40, 0,0)
 			contiunedDialogue = 16
+			health--
+			block = false
 			setTimeout(() => {checkZ();}, 250)
 		}
 	}
@@ -1270,16 +1290,16 @@ function checkZ(){ // check if z is pressed
 				toggleNote = false
 				dialogueOpen = false
 				return;
-			} else if (contiunedDialogue == 16){
-				setTimeout(() => {playersTurn();}, 250)
+			}
+			if (contiunedDialogue == 16){
 				toggleNote = false
 				dialogueOpen = false
-				return;
-			} else if (contiunedDialogue == 17){
-				setTimeout(() => {zombiesTurn();}, 250)
+				playersTurn()
+			}
+			if (contiunedDialogue == 17){
 				toggleNote = false
 				dialogueOpen = false
-				return;
+				zombiesTurn()
 			}
 		}
 	}
@@ -1314,10 +1334,17 @@ function fourToFive(){ //
 	contiunedDialogue = 6
 }
 function playersTurn(){
+	toggleNote = false
+	dialogueOpen = false
 	turn = 0
+	console.log("palyers turn")
 }
 function zombiesTurn(){
+	toggleNote = false
+	dialogueOpen = false
+	battleSelection = 0
 	turn = 1
+	console.log("zombies turn")
 }
 function addATKBuff(){ // attack buff joins ur team
 	diologueNumber = 21
@@ -1332,87 +1359,84 @@ function zombAttacks(){
 }
 function startBattle(Zlocation, Zhealth){
 	console.log("Started battle")
-	var zombieHP = Zhealth
-	var zombieLocation = Zlocation
-	var block = false
+	zombieHP = Zhealth //CHANGED
+	zombieLocation = Zlocation //CHANGED
+	block = false //CHANGED
 	stage = 69
-	console.log("stage isnt changing AH")
-	while (health > 0 || zombieHP > 0){
-		console.log("test 1")
+  //CHANGED
+}
+function checkBattle(){
+	if (stage == 69){
 		if (turn == 0){
-			console.log("test 2")
 			if (zPressed){
-				if (battleSelection == 0){ // if selected attack
-					console.log("attack")
+				if (battleSelection == 0){
 					var attack = Math.random() * 10
-					if (atkBuff == true){
+					if (atkBuff == false){
 						if (attack > 5){
-							zombieHP = zombieHP - 4
 							diologueNumber = 34
 							toggleNote = true
 							dialogueOpen = true
-							turn = 1
+							battleSelection = 4
+							zPressed = false
 						} else {
-							zombieHP = zombieHP - 4
 							diologueNumber = 35
 							toggleNote = true
 							dialogueOpen = true
-							turn = 1
+							battleSelection = 4
+							zPressed = false
 						}
 					} else {
 						if (attack > 5){
-							zombieHP = zombieHP - 7
 							diologueNumber = 36
 							toggleNote = true
 							dialogueOpen = true
-							turn = 1
+							battleSelection = 4
+							zPressed = false
 						} else {
-							zombieHP = zombieHP - 7
 							diologueNumber = 37
 							toggleNote = true
 							dialogueOpen = true
-							turn = 1
+							battleSelection = 4
+							zPressed = false
 						}
 					}
-				} else if (battleSelection == 1){ // if selected block
-					console.log("block")
+				} else if (battleSelection == 1){
+					console.log('block')
 					block = true
-					turn = 1
-				} else if (battleSelection == 2){ // if selected run
-					console.log("run")
-					if (zombieLocation == 'Office'){
-						diologueNumber = 41
-						toggleNote = true
-						dialogueOpen = true
-					}
+					diologueNumber = 42
+					toggleNote = true
+					dialogueOpen = true
+					battleSelection = 4
+					zPressed = false
+				} else if (battleSelection == 2){
+					console.log('run')
+					diologueNumber = 41
+					toggleNote = true
+					dialogueOpen = true
+					battleSelection = 4
+					zPressed = false
 				}
 			}
 		} else {
-			console.log("test 3")
-			var Zattack = Math.random() * 10
-			if (block == true){
-				health = health - 1
-				block = false
-				diologueNumber = 40
-				toggleNote = true
-				dialogueOpen = true
-				turn = 0
-			} else {
-				if (Zattack > 90){
+			if (block == false){
+				if (zAttack > 9){
+					var zAttack = Math.random() * 10
+					//console.log("heavy attack")
 					diologueNumber = 39
 					toggleNote = true
 					dialogueOpen = true
-					health = health - 12
-					turn = 0
 				} else {
+					//console.log("light attack")
 					diologueNumber = 38
 					toggleNote = true
 					dialogueOpen = true
-					health = health - 4
-					turn = 0
 				}
+			} else {
+				console.log("blocked attack")
+				diologueNumber = 40
+				toggleNote = true
+				dialogueOpen = true
 			}
-			
 		}
 	}
 }
@@ -2188,6 +2212,9 @@ function inGameFunction(keyboardEvent){
 					if (zombieDead == false){
 						
 					}
+  				} else if (stage == 69){
+  					//CHANGED
+        			checkBattle()
 				}
 			}
 			//console.log("z pressed")
