@@ -36,8 +36,8 @@ var zPressed = false
 // game variables
 var atkBuff = false // if the character has the attack buff teammate
 var defBuff = false // if the character has the defense buff teammate
-var attackDamage = 5
-var health = 10
+var attackDamage = 4
+var health = 15
 var moveSpeed = 5 // how fast the play moves...
 var inventoryOpen = false // is the inventory open
 var inventorySelection = 0 // what is selected in the inventory
@@ -49,9 +49,10 @@ var diologueNumber = 0 // what number to set diologue for
 var yesOrNo = 1 // this is a nightmare
 var yesOrNoOpen = false
 var turn = 0 // 0 = players turn, 1 = zombies turn
-var zombieHP = 0
+var zombieHP = 69420
 var zombieLocation = 0
 var block = false
+var counter =  false
 //#region diologue Numbers
 // 0 = cant go upstairs in house
 // 1 = go to sleep
@@ -93,6 +94,11 @@ var block = false
 // 38 = zombie light attack // 
 // 39 = zombie heavy attack // 
 // 40 = zombie attack but blocked //
+// 50 = tysm - defense buff
+// 51 = giving you shield
+// 52 = description of shield
+// 53 = you place shield
+// 54 = where to go next
 //#endregion
 var contiunedDialogue = 0
 var dia34 = new Image()
@@ -147,6 +153,19 @@ var dia33 = new Image()
 dia33.src = 'dialogue/dia33.png'
 var dia42 = new Image()
 dia42.src = 'dialogue/dia42.png'
+var dia43 = new Image()
+dia43.src = 'dialogue/dia43.png'
+
+var dia50 = new Image()
+dia50.src = 'dialogue/dia50.png'
+var dia51 = new Image()
+dia51.src = 'dialogue/dia51.png'
+var dia52 = new Image()
+dia52.src = 'dialogue/dia52.png'
+var dia53 = new Image()
+dia53.src = 'dialogue/dia53.png'
+var dia54 = new Image()
+dia54.src = 'dialogue/dia54.png'
 
 var yesReady = new Image()
 yesReady.src = 'dialogue/yesReady.png'
@@ -280,6 +299,7 @@ officeEnterance.src = 'train/officedoor.png'
 
 // variables for the office
 var zombieDead = false
+var returnToOffice = false
 
 //tutorial variables
 var tutorialScreen = 0
@@ -303,6 +323,10 @@ var inventoryItems = new Image()
 inventoryItems.src = 'inventory/inventoryItemsSelected.png'
 var inventorySave = new Image()
 inventorySave.src = 'inventory/inventorySaveSelected.png'
+var inventoryShield = new Image()
+inventoryShield.src = 'inventory/itemsShield.png'
+var inventoryNothing = new Image()
+inventoryNothing.src = 'inventory/itemsNothing.png'
 // images for the battle
 var attackSelected = new Image()
 attackSelected.src = 'inventory/AttackSelected.png'
@@ -498,6 +522,7 @@ function updateCanvas(){
 	manageInventory()
 	yesOrNoF()
 	toggleNoteF()
+	//console.log("player HP: " + health + " || " + "zombie HP: " + zombieHP)
 	//console.log(turn)
 
 	ctx.strokeStyle = "rgb(0,255,0)" // Draw the hitboxes bright green
@@ -531,7 +556,7 @@ function updateStats(){ // will update stats depending on if you have the buff o
 		attackDamage = 4
 	}
 	if (defBuff == true){
-		health = 25
+		health = 35
 	} else if (defBuff == false){
 		health = 15
 	}
@@ -880,6 +905,9 @@ function moveBackground(){ // moves the background
 			ctx.drawImage(officeBackground,0,0)
 		}
 	}
+	if (stage == 10){
+
+	}
 }
 function toggleNoteF(){ // updates dialogue for every part of the game
 	if (stage == 5){ // only works in house
@@ -887,43 +915,53 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			if (diologueNumber == 2){ //if the dialogue number is 2
 				ctx.drawImage(note,0,0,WIDTH,HEIGHT) //draw the dialogue accociated with 2
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			} else if (diologueNumber == 0){ // if its 0
 				ctx.drawImage(dia0,0,0, WIDTH,HEIGHT) // draw dialogue 0
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			} else if (diologueNumber == 1){ // if its one
 				//draw dialogue one
 			} else if (diologueNumber == 3){ //if its three
 				ctx.drawImage(dia3, 0,0,WIDTH,HEIGHT) //draw three
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			} else if (diologueNumber == 6){
 				ctx.drawImage(SavedTooEarly,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (toggleNote == true){
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 14){ // only atk buff
 					ctx.drawImage(team1,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 	
 				}
 				if(diologueNumber == 15){ // only def buff
 					ctx.drawImage(team2,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 16){ // atk and def buff
 					ctx.drawImage(team3,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 60){
+					ctx.drawImage(inventoryShield, 0,0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 61){
+					ctx.drawImage(inventoryNothing, 0, 0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
 				}
 			}
 		}
@@ -932,72 +970,82 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			if (diologueNumber == 4){ // if its four
 				ctx.drawImage(dia4, 0,0,WIDTH,HEIGHT) //draw dialogue four
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 5){ // if its five
 				ctx.drawImage(dia5,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
 				yesOrNo = false
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 6){ // if 6
 				ctx.drawImage(SavedTooEarly,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 8){ // noteboard 1
 				ctx.drawImage(dia8,0,0,WIDTH,HEIGHT)
 				yesOrNoOpen = false
 				contiunedDialogue = 2
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 9){ // noteboard 2
 				ctx.drawImage(dia9,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 3
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 10){ // noteboard 3
 				ctx.drawImage(dia10,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 4
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 
 			}
 			if(diologueNumber == 11){ // noteboard 4
 				ctx.drawImage(dia11,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 5
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 12){ // noteboard 5
 				ctx.drawImage(dia12,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 6
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 23){
 				ctx.drawImage(dia23,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (toggleNote == true){
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 14){ // only atk buff
 					ctx.drawImage(team1,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 	
 				}
 				if(diologueNumber == 15){ // only def buff
 					ctx.drawImage(team2,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 16){ // atk and def buff
 					ctx.drawImage(team3,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 60){
+					ctx.drawImage(inventoryShield, 0,0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 61){
+					ctx.drawImage(inventoryNothing, 0, 0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
 				}
 			}
 		}	
@@ -1006,34 +1054,44 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			if (diologueNumber == 7){
 				ctx.drawImage(SavedEarthOne,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 27){
 				ctx.drawImage(SavedEarthOneATK,0,0)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (toggleNote == true){
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 14){ // only atk buff
 					ctx.drawImage(team1,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 	
 				}
 				if(diologueNumber == 15){ // only def buff
 					ctx.drawImage(team2,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 16){ // atk and def buff
 					ctx.drawImage(team3,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 60){
+					ctx.drawImage(inventoryShield, 0,0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 61){
+					ctx.drawImage(inventoryNothing, 0, 0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
 				}
 			}
 		}
@@ -1042,59 +1100,69 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			if (diologueNumber == 17){
 				ctx.drawImage(SavedTent,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 18){
 				ctx.drawImage(dia18, 0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 19){
 				ctx.drawImage(dia19,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 20){
 				ctx.drawImage(dia20,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 12
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 21){
 				ctx.drawImage(dia21,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 22){
 				ctx.drawImage(savedTentATK, 0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 24){
 				ctx.drawImage(dia24, 0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (toggleNote == true){ // i do toggle note again just so i know where the team cut off is
 				if(diologueNumber == 13){ // no buffs
 					ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 14){ // only atk buff
 					ctx.drawImage(team1,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 	
 				}
 				if(diologueNumber == 15){ // only def buff
 					ctx.drawImage(team2,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
 				}
 				if(diologueNumber == 16){ // atk and def buff
 					ctx.drawImage(team3,0,0,WIDTH,HEIGHT)
 					contiunedDialogue = 0
-					setTimeout(() => {checkZ();}, 250)
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 60){
+					ctx.drawImage(inventoryShield, 0,0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
+				}
+				if (diologueNumber == 61){
+					ctx.drawImage(inventoryNothing, 0, 0,WIDTH,HEIGHT)
+					contiunedDialogue = 0
+					setTimeout(() => {checkZ();}, 100)
 				}
 			}
 		}
@@ -1103,50 +1171,60 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			if (diologueNumber == 25){
 				ctx.drawImage(savedTrain,0,0)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 28){
 				ctx.drawImage(savedTrainATK,0,0)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 26){
 				ctx.drawImage(dia26, 0,0)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 30){
 				ctx.drawImage(savedTrainDef, 0,0)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 31){ // both buffs
 				ctx.drawImage(savedTrainATKDEF, 0,0)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 		}
 		if (toggleNote == true){ // i do toggle note again just so i know where the team cut off is
 			if(diologueNumber == 13){ // no buffs
 				ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 14){ // only atk buff
 				ctx.drawImage(team1,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 
 			}
 			if(diologueNumber == 15){ // only def buff
 				ctx.drawImage(team2,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 16){ // atk and def buff
 				ctx.drawImage(team3,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 60){
+				ctx.drawImage(inventoryShield, 0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 61){
+				ctx.drawImage(inventoryNothing, 0, 0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 100)
 			}
 		}
 	} else if (stage == 9){ // if in the office
@@ -1154,95 +1232,142 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			if (diologueNumber == 29){
 				ctx.drawImage(cantSave,0,0)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 32){
 				ctx.drawImage(dia32,0,0)
 				contiunedDialogue = 13
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 33){
 				ctx.drawImage(dia33,0,0)
 				contiunedDialogue = 14
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
+			}
+		}
+		if (toggleNote == true){
+			if (diologueNumber == 50){
+				ctx.drawImage(dia50,0,0)
+				if (returnToOffice == false){
+					contiunedDialogue = 50
+				} else {
+					contiunedDialogue = 53
+				}
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 51){
+				ctx.drawImage(dia51,0,0)
+				contiunedDialogue = 51
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 52){
+				ctx.drawImage(dia52,0,0)
+				contiunedDialogue = 52
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 53){
+				ctx.drawImage(dia53,0,0)
+				contiunedDialogue = 53
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 54){
+				ctx.drawImage(dia54,0,0)
+				contiunedDialogue = 54
+				setTimeout(() => {checkZ();}, 100)
 			}
 		}
 		if (toggleNote == true){ // i do toggle note again just so i know where the team cut off is
 			if(diologueNumber == 13){ // no buffs
 				ctx.drawImage(team0,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 14){ // only atk buff
 				ctx.drawImage(team1,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 
 			}
 			if(diologueNumber == 15){ // only def buff
 				ctx.drawImage(team2,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if(diologueNumber == 16){ // atk and def buff
 				ctx.drawImage(team3,0,0,WIDTH,HEIGHT)
 				contiunedDialogue = 0
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 60){
+				ctx.drawImage(inventoryShield, 0,0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 61){
+				ctx.drawImage(inventoryNothing, 0, 0,WIDTH,HEIGHT)
+				contiunedDialogue = 0
+				setTimeout(() => {checkZ();}, 100)
 			}
 		}
-	} else if (stage == 69){ // if in battle
+	} else if (stage == 69){ // if in office battle
 		if (toggleNote == true){
 			if (diologueNumber == 41){
 				ctx.drawImage(cantRun,0,0)
 				contiunedDialogue = 17
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 42){
 				ctx.drawImage(dia42, 0,0)
 				contiunedDialogue = 17
-				setTimeout(() => {checkZ();}, 250)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 34){
 				ctx.drawImage(dia34, 0,0)
 				contiunedDialogue = 17
-				zombieHP = zombieHP - 4
-				setTimeout(() => {checkZ();}, 250)
+				calculateDamage("zombie", 4)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 35){
 				ctx.drawImage(dia35, 0,0)
 				contiunedDialogue = 17
-				zombieHP = zombieHP - 4
-				setTimeout(() => {checkZ();}, 250)
+				calculateDamage("zombie", 4)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 36){
 				ctx.drawImage(dia36, 0,0)
 				contiunedDialogue = 17
-				zombieHP = zombieHP - 7
-				setTimeout(() => {checkZ();}, 250)
+				calculateDamage("zombie", 7)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 37){
 				ctx.drawImage(dia37, 0,0)
 				contiunedDialogue = 17
-				zombieHP = zombieHP - 7
-				setTimeout(() => {checkZ();}, 250)
+				calculateDamage("zombie", 4)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 38){
 				ctx.drawImage(dia38, 0,0)
 				contiunedDialogue = 16
-				health = health - 4
-				setTimeout(() => {checkZ();}, 250)
+				calculateDamage("player", 4)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 39){
 				ctx.drawImage(dia39, 0,0)
 				contiunedDialogue = 16
-				health = health - 12
-				setTimeout(() => {checkZ();}, 250)
+				calculateDamage("player", 12)
+				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 40){
 				ctx.drawImage(dia40, 0,0)
 				contiunedDialogue = 16
-				health--
-				setTimeout(() => {checkZ();}, 250)
+				calculateDamage("player", 1)
+				setTimeout(() => {checkZ();}, 100)
+			}
+			if (diologueNumber == 43){ // zombie dies
+				ctx.drawImage(dia43, 0,0)
+				contiunedDialogue = 43
+				zombieDead = true
+				setTimeout(() => {checkZ();}, 100)
 			}
 		}
 	}
@@ -1263,7 +1388,7 @@ function checkZ(){ // check if z is pressed
 				console.log("no")
 				yesOrNoOpen = false
 				toggleNote = false
-				setTimeout(() => {saidNo();}, 250)
+				setTimeout(() => {saidNo();}, 100)
 			}
 		}
 	} else if (yesOrNoOpen == false){
@@ -1273,23 +1398,23 @@ function checkZ(){ // check if z is pressed
 				dialogueOpen = false
 			}
 			if (contiunedDialogue == 2){
-				setTimeout(() => {oneToTwo();}, 250)
+				setTimeout(() => {oneToTwo();}, 100)
 			} else if (contiunedDialogue == 3){
-				setTimeout(() => {twoToThree();}, 250)
+				setTimeout(() => {twoToThree();}, 100)
 			} else if (contiunedDialogue == 4){
-				setTimeout(() => {threeToFour();}, 250)
+				setTimeout(() => {threeToFour();}, 100)
 			} else if (contiunedDialogue == 5){
-				setTimeout(() => {fourToFive();}, 250)
+				setTimeout(() => {fourToFive();}, 100)
 			} else if (contiunedDialogue == 6){
 				toggleNote = false
 				dialogueOpen = false
 				noteboardOpen = false
 			} else if (contiunedDialogue == 12){
-				setTimeout(() => {addATKBuff();}, 250)
+				setTimeout(() => {addATKBuff();}, 100)
 			} else if (contiunedDialogue == 13){
-				setTimeout(() => {zombAttacks();}, 250)
+				setTimeout(() => {zombAttacks();}, 100)
 			} else if (contiunedDialogue == 14){
-				setTimeout(() => {startBattle('Office', 20);}, 250)
+				setTimeout(() => {startBattle('Office', 10);}, 100)
 				toggleNote = false
 				dialogueOpen = false
 				return;
@@ -1303,9 +1428,59 @@ function checkZ(){ // check if z is pressed
 				toggleNote = false
 				dialogueOpen = false
 				setTimeout(() => {zombiesTurn();}, 100)
+			} 
+			if (contiunedDialogue == 43){
+				stage = 9
+				diologueNumber = 50
+				toggleNote = true
+				dialogueOpen = true
+			}
+			if (contiunedDialogue == 50){
+				setTimeout(() => {fiveToOne();}, 100)
+			} else if (contiunedDialogue == 51){
+				setTimeout(() => {fiveToTwo();}, 100)
+			} else if (contiunedDialogue == 52){
+				setTimeout(() => {fiveToThree();}, 100)
+			}else if (contiunedDialogue == 53){
+				setTimeout(() => {fiveToFour();}, 100)
+			} else if (contiunedDialogue == 54){
+				toggleNote = false
+				dialogueOpen = false
+				BGxPosition = -665
+				BGyPosition = -100
+				playerXPosition = 280
+				playerYPosition = 180
+				updateStats()
+				returnToOffice = true
+				stage = 8
 			}
 		}
 	}
+}
+function fiveToOne(){
+	diologueNumber = 51
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 51
+}
+function fiveToTwo(){
+	diologueNumber = 52
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 52
+}
+function fiveToThree(){
+	diologueNumber = 53
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 53
+	defBuff = true
+}
+function fiveToFour(){
+	diologueNumber = 54
+	toggleNote = true
+	dialogueOpen = true
+	contiunedDialogue = 54
 }
 function saidNo(){
 	diologueNumber = 5
@@ -1337,7 +1512,7 @@ function fourToFive(){ //
 	contiunedDialogue = 6
 }
 function playersTurn(){
-	manageInventory()
+	counter = false
 	diologueNumber = 420
 	block = false
 	battleSelection = 0
@@ -1345,6 +1520,7 @@ function playersTurn(){
 	console.log("palyers turn")
 }
 function zombiesTurn(){
+	counter = false
 	turn = 1
 	console.log("zombies turn")
 }
@@ -1359,12 +1535,29 @@ function zombAttacks(){
 	toggleNote = true
 	dialogueOpen = true
 }
+function calculateDamage(target, damage){
+	if (target == "zombie"){
+		if (counter == false){
+			zombieHP = zombieHP - damage
+			counter = true
+		}
+	} else if (target == "player"){
+		if (counter == false){
+			health = health - damage
+			counter = true
+		}
+	}
+}
 function startBattle(Zlocation, Zhealth){
 	console.log("Started battle")
 	zombieHP = Zhealth
 	zombieLocation = Zlocation
 	block = false
-	stage = 69
+	if (zombieLocation == "Office"){
+		stage = 69
+	} else if (zombieLocation == "Lab"){
+		stage = 420
+	}
 }
 function checkBattle(){
 	if (stage == 69){
@@ -1445,6 +1638,9 @@ function checkBattle(){
 			console.log("kill player")
 		} else if (zombieHP <= 0){
 			console.log("kill zombie")
+			diologueNumber = 43
+			toggleNote = true
+			dialogueOpen = true
 		}
 	}
 }
@@ -1864,6 +2060,7 @@ function submitCode(){ // when the code button is pressed, check if the code wor
 				startingStage = 8
 				atkBuff = true
 				defBuff = true
+				returnToOffice = true
 				updateStats()
 				zombieDead = true
 				goodCode = true
@@ -2041,7 +2238,15 @@ function inGameFunction(keyboardEvent){
 					}
 				} else if (inventorySelection == 1) { // open items
 					console.log("go to items")
-					//open items menu
+					if (defBuff == true){
+						diologueNumber = 60
+						toggleNote = true
+						dialogueOpen = true
+					} else {
+						diologueNumber = 61
+						toggleNote = true
+						dialogueOpen = true
+					}
 				} else if (inventorySelection == 2) { // save game
 					if (stage == 5 || stage == 4){ // house and mars
 						console.log("Its too early to save now")
@@ -2209,18 +2414,23 @@ function inGameFunction(keyboardEvent){
 					}
 				} else if (stage == 8){ // if in train station
 					if (detectOfficeCollision()){
-						stage = 9
-						playerXPosition = 280
-						playerYPosition = 369
-						diologueNumber = 32
-						toggleNote = true
-						dialogueOpen = true
+						if (zombieDead == false){
+							stage = 9
+							playerXPosition = 280
+							playerYPosition = 369
+							diologueNumber = 32
+							toggleNote = true
+							dialogueOpen = true
+						} else {
+							stage = 9
+							playerXPosition = 280
+							playerYPosition = 369
+							diologueNumber = 50
+							toggleNote = true
+							dialogueOpen = true
+						}
 					}
-				} else if (stage == 9){ // train station office
-					if (zombieDead == false){
-						
-					}
-  				} else if (stage == 69){
+				} else if (stage == 69){
         			checkBattle()
 				}
 			}
