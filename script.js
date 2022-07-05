@@ -336,6 +336,42 @@ var runSelected = new Image()
 runSelected.src = 'inventory/RunSelected.png'
 var cantRun = new Image()
 cantRun.src = 'dialogue/cantRun.png'
+// images for the health bar
+//#region 15 hp health bar
+//#region
+
+//#endregion
+var HP1 = new Image()
+HP1.src = 'health/15HP/P1.png'
+var HP2 = new Image()
+HP2.src = 'health/15HP/P2.png'
+var HP3 = new Image()
+HP3.src = 'health/15HP/P3.png'
+var HP4 = new Image()
+HP4.src = 'health/15HP/P4.png'
+var HP5 = new Image()
+HP5.src = 'health/15HP/P5.png'
+var HP6 = new Image()
+HP6.src = 'health/15HP/P6.png'
+var HP7 = new Image()
+HP7.src = 'health/15HP/P7.png'
+var HP8 = new Image()
+HP8.src = 'health/15HP/P8.png'
+var HP9 = new Image()
+HP9.src = 'health/15HP/P9.png'
+var HP10 = new Image()
+HP10.src = 'health/15HP/P10.png'
+var HP11 = new Image()
+HP11.src = 'health/15HP/P11.png'
+var HP12 = new Image()
+HP12.src = 'health/15HP/P12.png'
+var HP13 = new Image()
+HP13.src = 'health/15HP/P13.png'
+var HP14 = new Image()
+HP14.src = 'health/15HP/P14.png'
+var HP15 = new Image()
+HP15.src = 'health/15HP/P15.png'
+//#endregion
 
 // extra images
 var interactButton = new Image()
@@ -508,6 +544,7 @@ function updateCanvas(){
 	detectDrawerCollision()
 	detectATKBuffCollision()
 	checkBattle()
+	updateHealth()
 
 	//console.log("stage " + stage) //this is my testing console.log
 	//console.log("bgx " + BGxPosition)
@@ -525,6 +562,7 @@ function updateCanvas(){
 	//console.log("player HP: " + health + " || " + "zombie HP: " + zombieHP)
 	//console.log(turn)
 
+	/*
 	ctx.strokeStyle = "rgb(0,255,0)" // Draw the hitboxes bright green
 	if (stage == 5){
 		ctx.strokeRect(tvXPosition, tvYPosition, 225, 141) // tv
@@ -548,6 +586,7 @@ function updateCanvas(){
 	} else if (stage == 8){
 		ctx.strokeRect(officexPosition,officeyPosition,136,210) // office door
 	}
+	*/
 }
 function updateStats(){ // will update stats depending on if you have the buff or not
 	if (atkBuff == true){
@@ -1529,6 +1568,41 @@ function addATKBuff(){ // attack buff joins ur team
 	toggleNote = true
 	dialogueOpen = true
 	atkBuff = true
+}
+function updateHealth(){
+	if (stage == 69){
+		if (health == 15){
+			ctx.drawImage(HP15,50,50)
+		} else if (health == 14){
+			ctx.drawImage(HP14,50,50)
+		} else if (health == 13){
+			ctx.drawImage(HP13,50,50)
+		} else if (health == 12){
+			ctx.drawImage(HP12,50,50)
+		} else if (health == 11){
+			ctx.drawImage(HP11,50,50)
+		} else if (health == 10){
+			ctx.drawImage(HP10,50,50)
+		} else if (health == 9){
+			ctx.drawImage(HP9,50,50)
+		} else if (health == 8){
+			ctx.drawImage(HP8,50,50)
+		} else if (health == 7){
+			ctx.drawImage(HP7,50,50)
+		} else if (health == 6){
+			ctx.drawImage(HP6,50,50)
+		} else if (health == 5){
+			ctx.drawImage(HP5,50,50)
+		} else if (health == 4){
+			ctx.drawImage(HP4,50,50)
+		} else if (health == 3){
+			ctx.drawImage(HP3,50,50)
+		} else if (health == 2){
+			ctx.drawImage(HP2,50,50)
+		} else if (health == 1){
+			ctx.drawImage(HP1,50,50)
+		}
+	}
 }
 function zombAttacks(){
 	diologueNumber = 33
