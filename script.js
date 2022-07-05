@@ -338,9 +338,6 @@ var cantRun = new Image()
 cantRun.src = 'dialogue/cantRun.png'
 // images for the health bar
 //#region 15 hp health bar
-//#region
-
-//#endregion
 var HP1 = new Image()
 HP1.src = 'health/15HP/P1.png'
 var HP2 = new Image()
@@ -372,7 +369,22 @@ HP14.src = 'health/15HP/P14.png'
 var HP15 = new Image()
 HP15.src = 'health/15HP/P15.png'
 //#endregion
-
+//#region 15 hp zombie
+var ZHP15 = new Image()
+ZHP15.src = 'health/15ZHP/Z15.png'
+var ZHP11 = new Image()
+ZHP11.src = 'health/15ZHP/Z11.png'
+var ZHP9 = new Image()
+ZHP9.src = 'health/15ZHP/Z9.png'
+var ZHP8 = new Image()
+ZHP8.src = 'health/15ZHP/Z8.png'
+var ZHP3 = new Image()
+ZHP3.src = 'health/15ZHP/Z3.png'
+var ZHP1 = new Image()
+ZHP1.src = 'health/15ZHP/Z1.png'
+var ZHP0 = new Image()
+ZHP0.src = 'health/15ZHP/Z0.png'
+//#endregion
 // extra images
 var interactButton = new Image()
 interactButton.src = 'extraResources/interactButton.png'
@@ -559,7 +571,7 @@ function updateCanvas(){
 	manageInventory()
 	yesOrNoF()
 	toggleNoteF()
-	//console.log("player HP: " + health + " || " + "zombie HP: " + zombieHP)
+	console.log("player HP: " + health + " || " + "zombie HP: " + zombieHP)
 	//console.log(turn)
 
 	/*
@@ -1381,7 +1393,7 @@ function toggleNoteF(){ // updates dialogue for every part of the game
 			if (diologueNumber == 37){
 				ctx.drawImage(dia37, 0,0)
 				contiunedDialogue = 17
-				calculateDamage("zombie", 4)
+				calculateDamage("zombie", 7)
 				setTimeout(() => {checkZ();}, 100)
 			}
 			if (diologueNumber == 38){
@@ -1453,7 +1465,7 @@ function checkZ(){ // check if z is pressed
 			} else if (contiunedDialogue == 13){
 				setTimeout(() => {zombAttacks();}, 100)
 			} else if (contiunedDialogue == 14){
-				setTimeout(() => {startBattle('Office', 10);}, 100)
+				setTimeout(() => {startBattle('Office', 15);}, 100)
 				toggleNote = false
 				dialogueOpen = false
 				return;
@@ -1601,6 +1613,21 @@ function updateHealth(){
 			ctx.drawImage(HP2,50,50)
 		} else if (health == 1){
 			ctx.drawImage(HP1,50,50)
+		}
+		if (zombieHP == 15){
+			ctx.drawImage(ZHP15,400,50)
+		} else if (zombieHP == 11){
+			ctx.drawImage(ZHP11,400,50)
+		} else if (zombieHP == 9){
+			ctx.drawImage(ZHP9,400,50)
+		} else if (zombieHP == 8){
+			ctx.drawImage(ZHP8,400,50)
+		} else if (zombieHP == 3){
+			ctx.drawImage(ZHP3,400,50)
+		} else if (zombieHP == 1){
+			ctx.drawImage(ZHP1,400,50)
+		} else if (zombieHP == 0){
+			ctx.drawImage(ZHP0,400,50)
 		}
 	}
 }
