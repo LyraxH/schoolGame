@@ -698,8 +698,7 @@ function startCanvas(){
 function updateCanvas(){
 	// reset the canvas
 	ctx.fillStyle = 'white'
-	ctx.fillRect(0,0,WIDTH, HEIGHT)
-	
+	ctx.fillRect(0,0,WIDTH, HEIGHT)	
 	checkStage()
 	manageMovement()
 	mainMenuText()
@@ -740,7 +739,7 @@ function updateCanvas(){
 	updateHealth()
 	theEnd()
 
-	console.log("stage " + stage) //this is my testing console.log
+	//console.log("stage " + stage) //this is my testing console.log
 	//console.log("bgx " + BGxPosition)
 	//console.log("bgy " + BGyPosition)
 	//console.log("tent "+ tentYPosition)
@@ -753,7 +752,8 @@ function updateCanvas(){
 	manageInventory()
 	yesOrNoF()
 	toggleNoteF()
-	console.log("player HP: " + health + " || " + "zombie HP: " + zombieHP)
+	drawBorders()
+	//console.log("player HP: " + health + " || " + "zombie HP: " + zombieHP)
 	//console.log(turn)
 
 	/*
@@ -796,7 +796,6 @@ function updateStats(){ // will update stats depending on if you have the buff o
 		health = 15
 	}
 }
-
 function yesOrNoF(){ // updates visual for the yes or no
 	if(yesOrNoOpen == true){ // if the yes or no bar is open
 		if (yesOrNo == 1){ // if its yes
@@ -979,6 +978,43 @@ function manageMovement(){ // makes it so that moving in two directions at the s
 		moveSpeed = 5
 	}
  }
+function drawBorders(){
+	var borderColor =  'green'
+	var unpressedColor = BACKGROUNDCOLOR
+	if (movingDown){
+		var borderXPosition = 0
+		ctx.fillStyle = borderColor
+		for (var i = 0; i < 15; i++){
+			ctx.fillRect(borderXPosition,475,50,5)
+			borderXPosition = borderXPosition + 50
+			console.log(borderXPosition)
+		}
+	} else if (movingUp){
+		var borderXPosition = 0
+		ctx.fillStyle = borderColor
+		for (var i = 0; i < 15; i++){
+			ctx.fillRect(borderXPosition,0,50,5)
+			borderXPosition = borderXPosition + 50
+			console.log(borderXPosition)
+		}
+	} else if (movingLeft){
+		var borderYPosition = 0
+		ctx.fillStyle = borderColor
+		for (var i = 0; i < 15; i++){
+			ctx.fillRect(0,borderYPosition,5,50)
+			borderYPosition = borderYPosition + 50
+			console.log(borderYPosition)
+		}
+	} else if (movingRight){
+		var borderYPosition = 0
+		ctx.fillStyle = borderColor
+		for (var i = 0; i < 15; i++){
+			ctx.fillRect(635,borderYPosition,5,50)
+			borderYPosition = borderYPosition + 50
+			console.log(borderYPosition)
+		}
+	}
+}
 function moveBackground(){ // moves the background
 	if (stage == 5){ // only works in the house
 		ctx.fillStyle = BACKGROUNDCOLOR
@@ -2902,7 +2938,7 @@ window.addEventListener('keyup', keyUpFunction)
 
 function keyUpFunction(keyboardEvent){ // sets the moving to false if the key is stopped being held down
 	var keyUp = keyboardEvent.key
-	if (stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8 || stage == 9 || stage == 10 || stage == 69 || stage == 420){
+	if (stage == 0 || stage == 2 || stage == 3 || stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8 || stage == 9 || stage == 10 || stage == 69 || stage == 420){
 		if (keyUp == "ArrowUp"){ // release up key
 			movingUp = false
 			//console.log("up released")
@@ -2939,7 +2975,7 @@ function inGameFunction(keyboardEvent){
 			console.log("changed to no")
 		}
 	}
-	if (stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8 || stage == 9 || stage == 10 || stage == 69 || stage == 420){ // this makes it only work in the game stage
+	if (stage == 0 || stage == 2 || stage == 3 || stage == 4 || stage == 5 || stage == 6 || stage == 7 || stage == 8 || stage == 9 || stage == 10 || stage == 69 || stage == 420){ // this makes it only work in the game stage
 		if (!dialogueOpen){ 
 			if (keyDown == "ArrowUp"){ // press up key
 				if (inventoryOpen == false){
